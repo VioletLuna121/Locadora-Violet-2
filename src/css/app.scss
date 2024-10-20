@@ -1,1 +1,5 @@
 // app global css in SCSS form
+body {
+  overflow: hidden; /* Remove a rolagem */
+  margin: 0; /* Remove a margem padrão do body */
+}

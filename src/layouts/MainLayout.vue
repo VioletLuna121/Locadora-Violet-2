@@ -1,106 +1,151 @@
-<template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+  <template>
+    <q-layout view="lHh Lpr lFf">
+      <q-header elevated>
+        <q-toolbar class="toolbar">
+          <q-btn
+            v-if="!isDashboardPage"
+            class="text-black"
+            flat
+            dense
+            round
+            icon="menu"
+            aria-label="Menu"
+            @click="toggleLeftDrawer"
+          />
 
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
+          <q-toolbar-title class="text-black" :class="{ 'dashboard-title': isDashboardPage }">
+            {{ pageTitle }}
+          </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
+          <div  class="text-black" >Bem vindo(a) <!--{{ $User }}--></div>
+          <q-btn flat icon="account_circle" aria-label="Perfil" class="text-black"/>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
+        </q-toolbar>
+      </q-header>
 
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
 
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
-</template>
+          <q-drawer
+          class=" BLateral"
+          v-model="leftDrawerOpen"
+          show-if-above
+          bordered
+          >
+            <q-list>
+              <router-link to="/DashBoard" class="LogoImg">
+                <img :src="logo" class="logo" />
+              </router-link>
+              <router-link
+                v-for="link in linksList"
+                :key="link.title"
+                :to="link.name || '#'"
+                style="text-decoration: none; color: white">
 
-<script setup>
-import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+              <q-item @click="leftDrawerOpen = false">
+                <q-item-section avatar>
+                  <q-icon :name="link.icon" size="28px"/>
+                </q-item-section>
 
-defineOptions({
-  name: 'MainLayout'
-})
+                <q-item-section>
+                  <q-item-label  class="text-body1 Links">{{ link.title }}</q-item-label>
+                </q-item-section>
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+                <q-item-section avatar>
+                  <q-icon name="chevron_right" size="28px"/>
+                </q-item-section>
+
+              </q-item>
+            </router-link>
+          </q-list>
+        </q-drawer>
+
+      <q-page-container>
+        <router-view :key="$route.fullPath"/>
+      </q-page-container>
+    </q-layout>
+  </template>
+
+  <script setup>
+  import { ref, computed } from 'vue'
+  import logo from '../assets/WDA GROUP LOGO.png';
+  import { useRoute } from 'vue-router'
+
+  defineOptions({
+    logo,
+    name: 'MainLayout'
+  })
+
+  const linksList = [
+    {
+      title: 'Cadastro de Usuário',
+      icon: 'person',
+      name: '/CadUser',
+    },
+    {
+      title: 'Cadastro de Editora',
+      icon: 'feed',
+      name: '/CadEdit'
+    },
+    {
+      title: 'Cadastro de Livro',
+      icon: 'book',
+      name: '/CadLivro'
+    },
+    {
+      title: 'Cadastro de Locatário',
+      icon: 'home',
+      name: '/CadLocatario'
+    },
+    {
+      title: 'Cadastro de Aluguel',
+      icon: 'paid',
+      name: '/CadAluguel'
+    }
+  ]
+
+
+
+  function toggleLeftDrawer () {
+    leftDrawerOpen.value = !leftDrawerOpen.value
   }
-]
 
-const leftDrawerOpen = ref(false)
+  const leftDrawerOpen = ref(false);
+  const route = useRoute()
 
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
-</script>
+  const pageTitle = computed(() => route.meta.title || 'Dashboard')
+
+  const isDashboardPage = computed(() => route.path === '/DashBoard')
+
+  </script>
+
+
+  <style>
+    .toolbar{
+      background-color: white;
+    }
+    .BLateral{
+      background-color: #303030;
+      width: 200px;
+      border-right:1px solid black ;
+    }
+    .LogoImg .logo{
+      width: 130px;
+      margin-left: 70px;
+      margin-top: 15px;
+    }
+    .Links{
+       position: relative;
+       right:10px;
+       padding: 0px;
+       white-space: nowrap;
+    }
+
+    .dashboard-title {
+      font-size: 22px; /* Aumenta o tamanho da fonte */
+      font-weight: 400;
+      border-left: 2px solid black;
+      padding-left: 10px !important;
+      margin-left: 5px;
+      width: auto; /* Permitir que a largura seja ajustada automaticamente */
+      }
+
+  </style>

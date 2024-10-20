@@ -15,9 +15,8 @@
         text-color="blue"
         unelevated
         to="/"
-        label="Go Home"
-        no-caps
-      />
+        label= "Go Home"
+        no-caps/>
     </div>
   </div>
 </template>

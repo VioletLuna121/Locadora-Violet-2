@@ -66,7 +66,7 @@
 
   <script setup>
   import { ref, computed } from 'vue'
-  import logo from '../assets/WDA GROUP LOGO.png';
+  import logo from '../assets/altislab_logo.png';
   import { useRoute } from 'vue-router'
 
   defineOptions({
@@ -123,13 +123,13 @@
       background-color: white;
     }
     .BLateral{
-      background-color: #303030;
+      background-color: #00234f;
       width: 200px;
       border-right:1px solid black ;
     }
     .LogoImg .logo{
-      width: 130px;
-      margin-left: 70px;
+      width: 110px;
+      margin-left: 80px;
       margin-top: 15px;
     }
     .Links{

@@ -145,8 +145,8 @@ export default {
 }
 
 .MiniModais{
-  margin-top: 20px;
-  margin-left: 45px;
+  margin-top: 30px;
+  margin-left: 30px;
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -172,7 +172,7 @@ export default {
 .Conteudo{
   display: flex;
   flex-direction: row;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .q-table tbody:nth-child(4) {

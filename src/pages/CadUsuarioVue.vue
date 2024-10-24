@@ -17,18 +17,18 @@
             </q-card-section>
 
             <q-card-section>
-              <q-form>
+              <q-form @submit="submitForm">
                 <q-input v-model="newUser.name" label="Nome" required borderless  class="InP"/>
                 <q-input v-model="newUser.email" label="Email" type="email" required borderless  class="InP"/>
-                <PasswordInput label="Senha" class="InP" v-model="password" borderless />
+                <PasswordInput label="Senha" class="InP" v-model="newUser.password" borderless required/>
 
                 <!-- Checkboxes de Permissão -->
                 <div class="q-gutter-md permission">
-                  <q-radio v-model="newUser.permissions" val="leitor" label="Leitor" color="dark"/>
-                  <q-radio v-model="newUser.permissions" val="editor" label="Editor" color="dark"/>
+                  <q-radio v-model="newUser.role" val="leitor" label="Leitor" color="secondary"/>
+                  <q-radio v-model="newUser.role" val="editor" label="Editor" color="secondary"/>
                 </div>
 
-                <q-btn type="submit" label="Cadastrar" color="secondary" class="CadastroButtom"/>
+                <q-btn type="submit" label="Cadastrar"  class="CadastroButtom"/>
               </q-form>
             </q-card-section>
           </q-card>
@@ -65,8 +65,8 @@
               <PasswordInput label="Senha" class="InP" v-model="selectedUser.password" borderless />
 
               <div class="q-gutter-md permission">
-                <q-radio v-model="selectedUser.permission" val="leitor" label="Leitor" color="dark"/>
-                <q-radio v-model="selectedUser.permission" val="editor" label="Editor" color="dark"/>
+                <q-radio v-model="selectedUser.permission" val="leitor" label="Leitor" color="secondary"/>
+                <q-radio v-model="selectedUser.permission" val="editor" label="Editor" color="secondary"/>
               </div>
 
               <q-btn label="Salvar" color="secondary" class="EditarButtom"/>
@@ -103,6 +103,7 @@
 <script>
 import { ref } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
+import { api } from 'src/boot/axios';
 
 export default {
   setup() {
@@ -139,24 +140,25 @@ export default {
     const tableColumns = ref([
       { name: 'name', label: 'Nome', align: 'center', field: row => row.name },
       { name: 'email', label: 'Email', align: 'center', field: row => row.email },
-      { name: 'permission', label: 'Permissão', align: 'center', field: row => row.permission },
+      { name: 'role', label: 'Permissão', align: 'center', field: row => row.role },
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
     const tableData = ref([
-      { id: 1, name: 'João', email: 'joao@gmail.com', permission: 'leitor', password: 'joao123' },
-      { id: 2, name: 'Maria', email: 'maria@gmail.com', permission: 'editor', password: 'maria123' },
+      { id: 1, name: 'João', email: 'joao@gmail.com', role: 'leitor', password: 'joao123' },
+      { id: 2, name: 'Maria', email: 'maria@gmail.com', role: 'editor', password: 'maria123' },
     ]);
 
     const selectedUser = ref(null);
     const newUser = ref({
       name: '',
       email: '',
-      permissions: {
-        leitor: false,
-        editor: false
-      }
+      password: '',
+      role: 'leitor', // Valor padrão
     });
+
+
+
     const password = ref('');
 
     return {
@@ -173,7 +175,8 @@ export default {
       selectedUser,
       newUser,
       password,
-      ConfirmDeleteImg
+      ConfirmDeleteImg,
+
     };
   }
 };
@@ -199,22 +202,21 @@ export default {
   height: 60px;
   justify-content: center;
   align-items: center;
-  padding-left: 65px;
   padding-top: 10px;
   border-radius: 15px !important;
 }
 
-.CardST2{
-  padding-left: 100px
-}
 
 .JmodalUser .tituloModal {
   color: white;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .JmodalUser .ModalCard {
-  background-color: #82E2E9;
+  background-color: #1e2085ab;
   width: 420px;
   border: 2px solid black;
   border-radius: 20px;
@@ -250,19 +252,21 @@ export default {
 
 }
 
-.CadastroButtom {
+.JmodalUser .CadastroButtom {
   margin-left: 130px;
   margin-top: 15px;
   margin-bottom: 10px;
+  background-color: #333333;
+  color: white;
 }
 
-.EditarButtom{
+.JmodalUser .EditarButtom{
   margin-left: 150px;
   margin-top: 15px;
   margin-bottom: 10px;
 }
 
-.DeleteModal {
+.JmodalUser .DeleteModal {
   backdrop-filter: blur(2px);
 }
 
@@ -278,7 +282,7 @@ export default {
 
 }
 
-.textDelete {
+.JmodalUser .textDelete {
   color: black;
   font-weight: bold;
   font-size: 17px;
@@ -286,7 +290,7 @@ export default {
 
 }
 
-.DeleteImg {
+.JmodalUser .DeleteImg {
   width: 200px;
   height: 200px;
 }

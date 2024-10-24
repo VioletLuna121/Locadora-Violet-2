@@ -54,7 +54,7 @@ const props = defineProps({
 
 }
 .q-table thead:nth-child(1) {
-  background-color: #333333;
+  background-color: #062041;
   color: white;
   font-weight: bold;
 }

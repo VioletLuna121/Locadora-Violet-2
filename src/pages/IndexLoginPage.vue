@@ -12,8 +12,8 @@
             <q-separator/>
 
             <q-card-section class="Card-Section-Two">
-              <q-form  class="q-gutter-y-md">
-                <q-input v-model="name" label="Nome"  class="InP" borderless :rules="[nam => !!nam || 'Nome é obrigatório']"/>
+              <q-form  class="q-gutter-y-md" @submit.prevent>
+                <q-input v-model="username" label="Nome"  class="InP" borderless :rules="[nam => !!nam || 'Nome é obrigatório']"/>
                 <password-input label="Senha" class="InP" v-model="password" borderless :rules="[val => !!val || 'Senha é obrigatória',
                                                                                                  val => val.length >= 8 || 'A senha está curta'
                                                                                                 ]"
@@ -44,35 +44,42 @@ export default {
   // name: 'IndexLogin',
 setup(){
   const password = ref('')
-  const name = ref('')
+  const username = ref('')
   const lembrarMe = ref(false)
   const router = useRouter();
 
   const LoginButtom = async () => {
-    try {
-      const response = await api.post( '/auth/login', {
-        username: name.value,
-        password: password.value,
+      try {
+        // Enviando a requisição de login para a API
+        const response = await api.post('/auth/login', {
+          username: username.value,
+          password: password.value,
+        }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
-      // Se o login for bem-sucedido, armazene o token no localStorage
-      if (response.data && response.data.token) {
-          localStorage.setItem('token', response.data.token); // Armazenando o token JWT
-          router.push('/DashBoard'); // Redirecionando para o Dashboard
-        }
-          else {
+        if (response.data && response.data.token) {
+          // Salvando o token no localStorage
+          localStorage.setItem('token', response.data.token);
+
+          // Redirecionando para o Dashboard após o login
+          router.push('/DashBoard');
+        } else {
           console.log('Erro no login:', response);
         }
       } catch (error) {
         console.error('Erro na autenticação:', error);
       }
-  };
+    };
+
 
   return{
     password,
     lembrarMe,
     logo,
-    name,
+    username,
     router,
     LoginButtom,
   }

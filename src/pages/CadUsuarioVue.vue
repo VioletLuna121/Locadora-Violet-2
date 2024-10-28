@@ -17,15 +17,15 @@
             </q-card-section>
 
             <q-card-section>
-              <q-form @submit="submitForm">
-                <q-input v-model="newUser.name" label="Nome" required borderless  class="InP"/>
+              <q-form @submit.prevent="CadNovoUser">
+                <q-input v-model="newUser.username" label="Nome" required borderless  class="InP"/>
                 <q-input v-model="newUser.email" label="Email" type="email" required borderless  class="InP"/>
                 <PasswordInput label="Senha" class="InP" v-model="newUser.password" borderless required/>
 
                 <!-- Checkboxes de Permissão -->
                 <div class="q-gutter-md permission">
-                  <q-radio v-model="newUser.role" val="leitor" label="Leitor" color="secondary"/>
-                  <q-radio v-model="newUser.role" val="editor" label="Editor" color="secondary"/>
+                  <q-radio v-model="newUser.role" val="leitor" label="Leitor" color="white"/>
+                  <q-radio v-model="newUser.role" val="editor" label="Editor" color="white"/>
                 </div>
 
                 <q-btn type="submit" label="Cadastrar"  class="CadastroButtom"/>
@@ -43,7 +43,7 @@
             </q-card-section>
 
             <q-card-section>
-              <q-input v-model="selectedUser.name" label="Nome" borderless class="InP" disable />
+              <q-input v-model="selectedUser.username" label="Nome" borderless class="InP" disable />
               <q-input v-model="selectedUser.email" label="Email" type="email" borderless class="InP" disable />
               <q-input v-model="selectedUser.password" label="Senha" type="text" borderless class="InP" disable />
               <q-input v-model="selectedUser.permission" label="Permissão" borderless class="InP InputView" disable />
@@ -60,13 +60,13 @@
             </q-card-section>
 
             <q-card-section>
-              <q-input v-model="selectedUser.name" label="Nome" borderless class="InP"/>
+              <q-input v-model="selectedUser.username" label="Nome" borderless class="InP"/>
               <q-input v-model="selectedUser.email" label="Email" type="email" borderless class="InP"/>
               <PasswordInput label="Senha" class="InP" v-model="selectedUser.password" borderless />
 
               <div class="q-gutter-md permission">
-                <q-radio v-model="selectedUser.permission" val="leitor" label="Leitor" color="secondary"/>
-                <q-radio v-model="selectedUser.permission" val="editor" label="Editor" color="secondary"/>
+                <q-radio v-model="selectedUser.permission" val="leitor" label="Leitor" color="white"/>
+                <q-radio v-model="selectedUser.permission" val="editor" label="Editor" color="white"/>
               </div>
 
               <q-btn label="Salvar" color="secondary" class="EditarButtom"/>
@@ -113,6 +113,50 @@ export default {
     const AbrirModalEdit = ref(false);
     const AbrirDeleteModal = ref(false);
 
+    const newUser = ref({
+      username: '',
+      email: '',
+      password: '',
+      role: 'leitor',
+    });
+
+    const CadNovoUser = async () => {
+  try {
+
+    const token = localStorage.getItem('token');
+
+    // Enviando os dados para a API
+    const response = await api.post('/users', {
+      name: newUser.value.username,
+      email: newUser.value.email,
+      password: newUser.value.password,
+      role: newUser.value.role,
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 201) {
+      // Adicionando o novo usuário à tabela (tableData)
+      tableData.value.push(response.data);
+
+      // Fechando o modal
+      JModalNew.value = false;
+
+      // Limpa o formulário
+      newUser.value = {
+        username: '',
+        email: '',
+        password: '',
+        role: 'leitor',
+      };
+    }
+  } catch (error) {
+    console.error('Erro ao cadastrar usuário:', error);
+  }
+};
+
     // Funções para abrir modais
     const openModalNew = () => {
       JModalNew.value = true;
@@ -138,26 +182,18 @@ export default {
 
     // Dados para a tabela
     const tableColumns = ref([
-      { name: 'name', label: 'Nome', align: 'center', field: row => row.name },
+      { name: 'username', label: 'Nome', align: 'center', field: row => row.username },
       { name: 'email', label: 'Email', align: 'center', field: row => row.email },
       { name: 'role', label: 'Permissão', align: 'center', field: row => row.role },
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
     const tableData = ref([
-      { id: 1, name: 'João', email: 'joao@gmail.com', role: 'leitor', password: 'joao123' },
-      { id: 2, name: 'Maria', email: 'maria@gmail.com', role: 'editor', password: 'maria123' },
+      { id: 1, username: 'João', email: 'joao@gmail.com', role: 'leitor', password: 'joao123' },
+      { id: 2, username: 'Maria', email: 'maria@gmail.com', role: 'editor', password: 'maria123' },
     ]);
 
     const selectedUser = ref(null);
-    const newUser = ref({
-      name: '',
-      email: '',
-      password: '',
-      role: 'leitor', // Valor padrão
-    });
-
-
 
     const password = ref('');
 
@@ -176,6 +212,7 @@ export default {
       newUser,
       password,
       ConfirmDeleteImg,
+      CadNovoUser,
 
     };
   }
@@ -216,7 +253,7 @@ export default {
 }
 
 .JmodalUser .ModalCard {
-  background-color: #1e2085ab;
+  background-color: #00234f;
   width: 420px;
   border: 2px solid black;
   border-radius: 20px;

@@ -35,7 +35,7 @@
 
 <script>
 import { ref } from 'vue';
-import logo from '../assets/WDA GROUP LOGO.png';
+import logo from '../assets/logo_escura.png';
 import { useRouter } from 'vue-router';
 import { api } from 'src/boot/axios';
 
@@ -54,11 +54,7 @@ setup(){
         const response = await api.post('/auth/login', {
           username: username.value,
           password: password.value,
-        }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+        });
 
         if (response.data && response.data.token) {
           // Salvando o token no localStorage
@@ -92,7 +88,7 @@ setup(){
   .C-PrinIndex{
     width: 30%;
     height: 390px;
-    background-color: $primary;
+    background-color: #00244fd2;
     border-radius: 15px;
     border: solid 3px black;
   }
@@ -145,10 +141,12 @@ setup(){
 
   .Loginlogo{
     position: absolute;
-    top: 15px;
-    left: 20px;
-    width: 100px;
+    top: -5px;
+    left: 5px;
+    width: 150px;
     height: auto;
+    padding: 20px;
+
   }
 
 </style>

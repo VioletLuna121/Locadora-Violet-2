@@ -11,7 +11,7 @@
                   <div class="textBox">Atrasados</div>
                 </div>
                 <div class="icon">
-                  <q-icon name="warning" size="44px" color="red"></q-icon> <!-- Ícone de Atrasados -->
+                  <q-icon name="warning" size="44px" style="color: #b3eef1;"></q-icon> <!-- Ícone de Atrasados -->
                 </div>
               </div>
           </q-card>
@@ -24,7 +24,7 @@
                 <div class="textBox">Empréstimos</div>
               </div>
               <div class="icon">
-                <q-icon name="library_books" size="44px" color="blue"></q-icon> <!-- Ícone de Empréstimos -->
+                <q-icon name="library_books" size="44px" style="color: #b3eef1;"></q-icon> <!-- Ícone de Empréstimos -->
               </div>
 
             </div>
@@ -38,7 +38,7 @@
                 <div class="textBox">Devolvidos</div>
               </div>
               <div class="icon">
-                <q-icon name="beenhere" size="44px" color="green"></q-icon>  <!-- Ícone de Devolvidos -->
+                <q-icon name="beenhere" size="44px" style="color: #b3eef1;"></q-icon>  <!-- Ícone de Devolvidos -->
               </div>
 
             </div>
@@ -52,7 +52,7 @@
                 <div class="textBox">Devolvidos</div>
               </div>
               <div class="icon">
-                <q-icon name="book" size="44px" color="brown"></q-icon> <!-- Ícone de Livros -->
+                <q-icon name="book" size="44px" style="color: #b3eef1;"></q-icon> <!-- Ícone de Livros -->
               </div>
 
             </div>
@@ -136,6 +136,7 @@ export default {
   height: 30px;
   font-size: 16px;
   font-weight: 500;
+  color: rgba(0, 0, 0, 0.63);
 }
 
 .icon {

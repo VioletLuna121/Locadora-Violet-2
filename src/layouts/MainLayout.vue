@@ -38,7 +38,7 @@
               v-for="link in linksList"
               :key="link.title"
               :to="link.name || '#'"
-              style="text-decoration: none; color: white">
+              class="LinksList">
 
             <q-item @click="leftDrawerOpen = false">
               <q-item-section avatar>
@@ -47,10 +47,6 @@
 
               <q-item-section>
                 <q-item-label  class="text-body1 Links">{{ link.title }}</q-item-label>
-              </q-item-section>
-
-              <q-item-section avatar>
-                <q-icon name="chevron_right" size="28px"/>
               </q-item-section>
 
             </q-item>
@@ -66,7 +62,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import logo from '../assets/altislab_logo.png';
+import logo from '../assets/logo_escura.png';
 import { useRoute } from 'vue-router'
 
 defineOptions({
@@ -123,9 +119,9 @@ const isDashboardPage = computed(() => route.path === '/DashBoard')
     background-color: white;
   }
   .BLateral{
-    background-color: #00234f;
+    background-color: #e0f8f9;
     width: 200px;
-    border-right:1px solid black ;
+    border-right:1px solid rgba(0, 0, 0, 0.459) ;
   }
   .LogoImg .logo{
     width: 110px;
@@ -134,9 +130,17 @@ const isDashboardPage = computed(() => route.path === '/DashBoard')
   }
   .Links{
      position: relative;
-     right:10px;
+     right:20px;
      padding: 0px;
      white-space: nowrap;
+
+  }
+
+  .LinksList{
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.829);
+    text-indent: 20px;
+
   }
 
   .dashboard-title {
@@ -146,6 +150,7 @@ const isDashboardPage = computed(() => route.path === '/DashBoard')
     padding-left: 10px !important;
     margin-left: 5px;
     width: auto; /* Permitir que a largura seja ajustada automaticamente */
-    }
+  }
+
 
 </style>

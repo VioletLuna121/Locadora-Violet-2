@@ -5,11 +5,11 @@
         <img :src="logo" class="Loginlogo"/>
           <q-card class="C-PrinIndex" borderless>
 
-            <q-card-section class="q-pa-md" style="background-color:#333333; border-radius: 10px; display: flex; justify-content: center; height: 15%; ">
-             <div class="text-h4 text-white text-weight-medium" style="position: relative; bottom: 7px; left: 10px; ">Login</div>
+            <q-card-section class="q-pa-md" style=" display: flex; justify-content: center; height: 15%; ">
+             <div class="text-h4 text-weight-medium" style="position: relative; bottom: 7px; left: 10px; color: #333333; ">Login</div>
             </q-card-section>
 
-            <q-separator/>
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.699);"/>
 
             <q-card-section class="Card-Section-Two">
               <q-form  class="q-gutter-y-md" @submit.prevent>
@@ -24,7 +24,7 @@
             <q-checkbox label="Lembrar-me" class="checkbox" v-model="lembrarMe" />
 
             <q-card-actions align="center" class="column">
-              <q-btn label="Entrar" class="Login" @click="LoginButtom" />
+              <q-btn label="Entrar" class="Login" @click="LoginButtom"/>
               <q-btn  label="Esqueceu a Senha?" flat style="position: relative; bottom: 10px;" @click="EsqueceuSenha"/>
             </q-card-actions>
           </q-card>
@@ -88,9 +88,9 @@ setup(){
   .C-PrinIndex{
     width: 30%;
     height: 390px;
-    background-color: #00244fd2;
+    background-color: #ffffff;
     border-radius: 15px;
-    border: solid 3px black;
+    border: solid 2px rgba(0, 0, 0, 0.699);
   }
   .C-PrinIndex .Card-Section-One{
     background-color: $secondary;
@@ -103,12 +103,13 @@ setup(){
   }
 
   .C-PrinIndex .Card-Section-Two{
-    margin-top: 5%;
+    margin-top: 4%;
     width: 80%;
     margin-left: 10%;
   }
 
   .Q-Page{
+    background-color: #e0f8f9;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -124,14 +125,14 @@ setup(){
   .C-PrinIndex .InP{
     border-radius: 10px;
     background-color: white;
-    border: solid 1px black;
+    border: solid 2px rgba(0, 0, 0, 0.550);
     padding-left: 10px;
     height: 60px;
   }
 
   .C-PrinIndex .Login{
-    background-color: $secondary;
-    color:white;
+    background-color: #82e2e9;
+    color:black;
     height: 40px;
     width: 100px;
     margin-bottom: 10px;

@@ -6,15 +6,17 @@
           <NovoButton @click="openModalNew" class="NButtom"/>
           <BarraPesquisa class="BPesquisa"/>
         </div>
-        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
+        <TabelaGeral :rows="tableData" :columns="tableColumns"  class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
 
         <!-- Modal para Novo Usuário -->
         <q-dialog v-model="JModalNew" class="JmodalUser Sombra" persistent>
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Cadastrar Usuário</div>
-              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="white"/>
+              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-form @submit.prevent="CadNovoUser">
@@ -24,8 +26,8 @@
 
                 <!-- Checkboxes de Permissão -->
                 <div class="q-gutter-md permission">
-                  <q-radio v-model="newUser.role" val="leitor" label="Leitor" color="white"/>
-                  <q-radio v-model="newUser.role" val="editor" label="Editor" color="white"/>
+                  <q-radio v-model="newUser.role" val="VISITOR" label="VISITOR" color="$primary"/>
+                  <q-radio v-model="newUser.role" val="ADMIN" label="ADMIN" color="$primary"/>
                 </div>
 
                 <q-btn type="submit" label="Cadastrar"  class="CadastroButtom"/>
@@ -39,8 +41,10 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Dados do Usuário</div>
-              <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="white"/>
+              <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-input v-model="selectedUser.username" label="Nome" borderless class="InP" disable />
@@ -56,8 +60,10 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo CardST2">
               <div class="text-h4 tituloModal">Editar Dados</div>
-              <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="white"/>
+              <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-input v-model="selectedUser.username" label="Nome" borderless class="InP"/>
@@ -65,11 +71,11 @@
               <PasswordInput label="Senha" class="InP" v-model="selectedUser.password" borderless />
 
               <div class="q-gutter-md permission">
-                <q-radio v-model="selectedUser.permission" val="leitor" label="Leitor" color="white"/>
-                <q-radio v-model="selectedUser.permission" val="editor" label="Editor" color="white"/>
+                <q-radio v-model="selectedUser.permission" val="VISITOR" label="VISITOR" color="$primary"/>
+                <q-radio v-model="selectedUser.permission" val="ADMIN" label="ADMIN" color="$primary"/>
               </div>
 
-              <q-btn label="Salvar" color="secondary" class="EditarButtom"/>
+              <q-btn label="Salvar" class="EditarButtom"/>
             </q-card-section>
           </q-card>
         </q-dialog>
@@ -101,7 +107,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
 import { api } from 'src/boot/axios';
 
@@ -117,45 +123,100 @@ export default {
       username: '',
       email: '',
       password: '',
-      role: 'leitor',
+      role: 'VISITOR',
     });
 
+    const tableData = ref([]);
+    const tableColumns = ref([
+      { name: 'id', label: 'ID', align: 'center', field: row => row.id },
+      { name: 'name', label: 'Nome', align: 'center', field: row => row.name },
+      { name: 'role', label: 'Permissão', align: 'center', field: row => row.role },
+      { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
+    ]);
+
+    const totalPages = ref(0);
+    const currentPage = ref(1); // Página inicial
+
+    // Função para buscar todos os usuários de uma vez
+    const BuscarUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/users`, {
+          params: { size: 1000, sort: 'id', direction: 'ASC' }, // Define um valor alto para size
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Verifique se há dados na resposta
+        if (response.data && response.data.content) {
+          tableData.value = response.data.content; // Atualiza os dados da tabela
+        } else {
+          console.warn('Nenhum dado foi retornado da API.');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar usuários:', error.response?.data || error.message);
+      }
+    };
+
+        // Chame `fetchUsers` ao montar
+        onMounted(() => {
+          BuscarUser();
+        });
+
+
+    // Cadastro de novo usuário
     const CadNovoUser = async () => {
-  try {
+      try {
+        const token = localStorage.getItem('token');
 
-    const token = localStorage.getItem('token');
+        const response = await api.post(
+          '/users',
+          {
+            name: newUser.value.username,
+            email: newUser.value.email,
+            password: newUser.value.password,
+            role: newUser.value.role,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-    // Enviando os dados para a API
-    const response = await api.post('/users', {
-      name: newUser.value.username,
-      email: newUser.value.email,
-      password: newUser.value.password,
-      role: newUser.value.role,
+        if (response.status === 201) {
 
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+          // Fechar o modal e limpar o formulário
+          JModalNew.value = false;
+          newUser.value = {
+          username: '',
+          email: '',
+          password: '',
+          role: 'USER' };
+        }
+      } catch (error) {
+        console.error('Erro ao cadastrar usuário:', error.response?.data || error.message);
+      }
+    };
 
-    if (response.status === 201) {
-      // Adicionando o novo usuário à tabela (tableData)
-      tableData.value.push(response.data);
 
-      // Fechando o modal
-      JModalNew.value = false;
+    const deleteUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
 
-      // Limpa o formulário
-      newUser.value = {
-        username: '',
-        email: '',
-        password: '',
-        role: 'leitor',
-      };
-    }
-  } catch (error) {
-    console.error('Erro ao cadastrar usuário:', error);
-  }
-};
+        // Realiza a requisição de exclusão do usuário
+        const response = await api.delete(`/users/${selectedUser.value.id}`, {
+          headers: {Authorization:`Bearer ${token}`},
+        });
+
+        if (response.status === 204) {
+           // Fechar o modal de exclusão e atualizar a tabela
+           AbrirDeleteModal.value = false;
+           await BuscarUser(); // Atualiza a lista de usuários
+           console.log('Usuário excluído com sucesso.');
+        }
+      }
+      catch(error) {
+        console.error('Erro ao excluir usuário:', error.response?.data || error.message);
+      }
+    };
 
     // Funções para abrir modais
     const openModalNew = () => {
@@ -163,39 +224,21 @@ export default {
     };
 
     const viewItem = (row) => {
-      console.log('Visualizando:', row);
       selectedUser.value = row;
       AbrirModalView.value = true;
     };
 
     const editItem = (row) => {
-      console.log('Editando:', row);
       selectedUser.value = row;
       AbrirModalEdit.value = true;
     };
 
     const deleteItem = (row) => {
-      console.log('Deletando:', row);
       selectedUser.value = row;
       AbrirDeleteModal.value = true;
     };
 
-    // Dados para a tabela
-    const tableColumns = ref([
-      { name: 'username', label: 'Nome', align: 'center', field: row => row.username },
-      { name: 'email', label: 'Email', align: 'center', field: row => row.email },
-      { name: 'role', label: 'Permissão', align: 'center', field: row => row.role },
-      { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
-    ]);
-
-    const tableData = ref([
-      { id: 1, username: 'João', email: 'joao@gmail.com', role: 'leitor', password: 'joao123' },
-      { id: 2, username: 'Maria', email: 'maria@gmail.com', role: 'editor', password: 'maria123' },
-    ]);
-
     const selectedUser = ref(null);
-
-    const password = ref('');
 
     return {
       JModalNew,
@@ -210,9 +253,11 @@ export default {
       tableColumns,
       selectedUser,
       newUser,
-      password,
       ConfirmDeleteImg,
       CadNovoUser,
+      totalPages,
+      currentPage,
+      BuscarUser,
 
     };
   }
@@ -235,17 +280,17 @@ export default {
 }
 
 .JmodalUser .CardSectionTitulo {
-  background-color: #333333;
+  background-color: white;
   height: 60px;
   justify-content: center;
   align-items: center;
   padding-top: 10px;
-  border-radius: 15px !important;
+
 }
 
 
 .JmodalUser .tituloModal {
-  color: white;
+  color: black;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -253,9 +298,9 @@ export default {
 }
 
 .JmodalUser .ModalCard {
-  background-color: #00234f;
+  background-color: #ffffff;
   width: 420px;
-  border: 2px solid black;
+  border: 2px solid  rgba(0, 0, 0, 0.699);
   border-radius: 20px;
 }
 
@@ -269,7 +314,7 @@ export default {
   margin-top: 20px;
   border-radius: 10px;
   background-color: white;
-  border: solid 1px black;
+  border: solid 2px rgba(0, 0, 0, 0.550);
   padding-left: 10px;
 }
 
@@ -293,14 +338,15 @@ export default {
   margin-left: 130px;
   margin-top: 15px;
   margin-bottom: 10px;
-  background-color: #333333;
-  color: white;
+  background-color: #82e2e9;
+  color: black;
 }
 
 .JmodalUser .EditarButtom{
   margin-left: 150px;
   margin-top: 15px;
   margin-bottom: 10px;
+  background-color: #82e2e9;
 }
 
 .JmodalUser .DeleteModal {

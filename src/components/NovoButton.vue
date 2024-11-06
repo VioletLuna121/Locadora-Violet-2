@@ -2,7 +2,6 @@
   <q-btn
     label="Novo"
     icon="add"
-    color="White"
     text-color="black"
     class="NovoButton"
     dense
@@ -20,6 +19,7 @@
   border: 1px solid black;
   box-shadow: 1px 3px 3px rgba(0, 0, 0, 0.479);
   height: 38px;
+  background-color: #b3eef1;
 
 }
 

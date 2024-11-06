@@ -23,12 +23,12 @@ export default defineComponent({
         datasets: [
           {
             label: 'Empréstimos',
-            backgroundColor: '#006666',
+            backgroundColor: '#b3eef1',
             data: [0, 3, 4, 10,14,9,8]
           },
           {
             label: 'Aluguéis',
-            backgroundColor: '#8B8989',
+            backgroundColor: '#ffd8b0',
             data: [10, 18, 22, 17,8,16,2]
           }
         ]

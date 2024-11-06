@@ -236,7 +236,7 @@ export default {
 }
 
 .JmodalRenter .ModalCard {
-  background-color: #82E2E9;
+  background-color: #00234f;
   min-width: 50%;
   border: 2px solid black;
   border-radius: 20px;
@@ -285,7 +285,7 @@ export default {
 .DeleteModal {
   backdrop-filter: blur(2px);
 }
-                         
+
 .DeleteModalCard {
   background-color: #ffffff;
   width: 400px;

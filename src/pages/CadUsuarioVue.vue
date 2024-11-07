@@ -47,10 +47,10 @@
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
-              <q-input v-model="selectedUser.username" label="Nome" borderless class="InP" disable />
-              <q-input v-model="selectedUser.email" label="Email" type="email" borderless class="InP" disable />
-              <q-input v-model="selectedUser.password" label="Senha" type="text" borderless class="InP" disable />
-              <q-input v-model="selectedUser.permission" label="Permissão" borderless class="InP InputView" disable />
+              <q-input v-model="DadosUser.id" label="ID" borderless class="InP" disable />
+              <q-input v-model="DadosUser.name" label="Nome" borderless class="InP" disable />
+              <q-input v-model="DadosUser.email" label="Email" type="email" borderless class="InP" disable />
+              <q-input v-model="DadosUser.role" label="Permissão" borderless class="InP InputView" disable />
             </q-card-section>
           </q-card>
         </q-dialog>
@@ -95,7 +95,7 @@
 
             <q-card-section class=" q-gutter-sm q-pt-none CardButtonDelete">
               <div class="q-gutter-md buttonsDelete">
-                <q-btn label="Sim" color="red" class="Button"/>
+                <q-btn label="Sim" color="red" class="Button" @click="deletarUser"/>
                 <q-btn label="Não" color="dark" @click="AbrirDeleteModal = (false)" class="Button"/>
               </div>
             </q-card-section>
@@ -168,9 +168,8 @@ export default {
       try {
         const token = localStorage.getItem('token');
 
-        const response = await api.post(
-          '/users',
-          {
+        const response = await api.post('/users',{
+
             name: newUser.value.username,
             email: newUser.value.email,
             password: newUser.value.password,
@@ -196,24 +195,46 @@ export default {
       }
     };
 
+    // Novo estado para armazenar os detalhes do usuário
+    const DadosUser = ref({}); // Inicializado como objeto vazio para evitar problemas de acesso
 
-    const deleteUser = async () => {
+    // Função para buscar os detalhes do usuário
+    const BuscarDadosUser = async (userId) => {
+      try {
+        console.log("Buscando dados do usuário com ID:", userId); // Log para depuração
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        DadosUser.value = response.data; // Armazena os detalhes do usuário
+        console.log("Dados do usuário carregados:", DadosUser.value); // Log dos dados carregados
+
+        // Abre o modal de visualização após carregar os dados
+        AbrirModalView.value = true;
+      } catch (error) {
+        console.error('Erro ao buscar detalhes do usuário:', error.response?.data || error.message);
+      }
+    };
+
+    const deletarUser = async () => {
       try {
         const token = localStorage.getItem('token');
+        const userId = selectedUser.value?.id; // Obtém o ID do usuário
 
         // Realiza a requisição de exclusão do usuário
-        const response = await api.delete(`/users/${selectedUser.value.id}`, {
-          headers: {Authorization:`Bearer ${token}`},
+        const response = await api.delete(`/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.status === 204) {
-           // Fechar o modal de exclusão e atualizar a tabela
-           AbrirDeleteModal.value = false;
-           await BuscarUser(); // Atualiza a lista de usuários
-           console.log('Usuário excluído com sucesso.');
+          console.log('Usuário excluído com sucesso.');
+          AbrirDeleteModal.value = false;
+          await BuscarUser(); // Atualiza a lista de usuários
+        } else {
+          console.warn('A API retornou um status inesperado:', response.status);
         }
-      }
-      catch(error) {
+      } catch (error) {
         console.error('Erro ao excluir usuário:', error.response?.data || error.message);
       }
     };
@@ -224,8 +245,10 @@ export default {
     };
 
     const viewItem = (row) => {
+      console.log("Visualizando usuário:", row);
       selectedUser.value = row;
       AbrirModalView.value = true;
+      BuscarDadosUser(row.id);
     };
 
     const editItem = (row) => {
@@ -258,6 +281,9 @@ export default {
       totalPages,
       currentPage,
       BuscarUser,
+      deletarUser,
+      DadosUser,
+      BuscarDadosUser
 
     };
   }

@@ -13,17 +13,19 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Cadastrar Editora</div>
-              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="white"/>
+              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-form>
-                <q-input v-model="newUser.publisher" label="Editora" required borderless  class="InP"/>
+                <q-input v-model="newUser.name" label="Editora" required borderless  class="InP"/>
                 <q-input v-model="newUser.email" label="Email" type="email" required borderless  class="InP"/>
                 <q-input v-model="newUser.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
                 <q-input v-model="newUser.site" label="Site"  borderless  class="InP"/>
 
-                <q-btn type="submit" label="Cadastrar" color="secondary" class="CadastroButtom"/>
+                <q-btn type="submit" label="Cadastrar" class="CadastroButtom" @click="CadPublisher"/>
               </q-form>
             </q-card-section>
           </q-card>
@@ -34,7 +36,7 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Dados da Editora</div>
-              <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="white"/>
+              <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="black"/>
             </q-card-section>
 
             <q-card-section class="marginBottom">
@@ -51,7 +53,7 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo CardST2">
               <div class="text-h4 tituloModal">Editar Dados</div>
-              <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="white"/>
+              <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="black"/>
             </q-card-section>
 
             <q-card-section>
@@ -94,6 +96,7 @@
 <script>
 import { ref } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
+import { api } from 'src/boot/axios';
 
 export default {
   setup() {
@@ -126,30 +129,59 @@ export default {
       AbrirDeleteModal.value = true;
     };
 
+    const tableData = ref([]);
+
     // Dados para a tabela
     const tableColumns = ref([
-      { name: 'publisher', label: 'Editora', align: 'center', field: row => row.publisher },
+      { name: 'name', label: 'name', align: 'center', field: row => row.name },
       { name: 'email', label: 'Email', align: 'center', field: row => row.email },
       { name: 'telephone', label: 'Telefone', align: 'center', field: row => row.telephone },
       { name: 'site', label: 'Site', align: 'center', field: row => row.site },
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
-    const tableData = ref([
-      { id: 1, publisher: 'Seu jorge', email: 'seujorge@gmail.com', telephone: '85997007530', site: 'https://seujorge.com' },
-      { id: 2, publisher: 'Globo Alt', email: 'globoalt@gmail.com', telephone: '(11) 4003-9393', site: 'https://www.companhiadasletras.com.br/' },
-      { id: 3, publisher: 'Editora 34	', email: 'contato@editora34.com.br', telephone: '+55 11 3315-3322', site: 'http://127.0.0.1:5500/html/editora34.com.br' },
-      { id: 4, publisher: 'Intrínseca', email: 'atendimento@intrinseca.com.br', telephone: '+55 21 2220-6767	', site: 'http://127.0.0.1:5500/html/intrinseca.com.br' },
+    const CadPublisher = async () => {
+      try {
+        const token = localStorage.getItem('token');
 
-    ]);
+        const response = await api.post('/publisher',{
+
+          name: newUser.value.name,
+          email: newUser.value.email,
+          telephone: newUser.value.telephone,
+          site: newUser.value.site,
+        },
+        {
+          headers: {Authorization: `Bearer ${token}`}
+        }
+        );
+
+        if (response.status === 201) {
+
+          // Fechar o modal e limpar o formulário
+          JModalNew.value = false;
+          newUser.value = {
+          name: '',
+          email: '',
+          telephone: '',
+          site: '' };
+        }
+      } catch (error) {
+        console.error('Erro ao cadastrar usuário:', error.response?.data || error.message);
+      }
+    };
+
+    
 
     const selectedUser = ref(null);
-      const newUser = ref({
-        publisher: '',
-        email: '',
-        telephone:'',
-        site:'',
-      });
+
+    const newUser = ref({
+      name: '',
+      email: '',
+      telephone:'',
+      site:'',
+    });
+
     const password = ref('');
 
     return {
@@ -166,7 +198,8 @@ export default {
       selectedUser,
       newUser,
       password,
-      ConfirmDeleteImg
+      ConfirmDeleteImg,
+      CadPublisher
     };
   }
 };
@@ -188,13 +221,11 @@ export default {
 }
 
 .JmodalPublisher .CardSectionTitulo {
-  background-color: #333333;
+  background-color: white;
   height: 60px;
-  justify-content: center;
-  align-items: center;
-  padding-left: 65px;
-  padding-top: 10px;
   border-radius: 15px !important;
+  align-items: center;
+  padding-top: 10px;
 }
 
 .CardST2{
@@ -202,14 +233,18 @@ export default {
 }
 
 .JmodalPublisher .tituloModal {
-  color: white;
+  color: rgb(0, 0, 0);
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+
 .JmodalPublisher .ModalCard {
-  background-color: #82E2E9;
+  background-color: white;
   width: 420px;
-  border: 2px solid black;
+  border: 2px solid  rgba(0, 0, 0, 0.699);
   border-radius: 20px;
 }
 
@@ -236,6 +271,7 @@ export default {
   margin-left: 130px;
   margin-top: 25px;
   margin-bottom: 10px;
+  background-color: #82e2e9;
 }
 
 .EditarButtom{
@@ -302,7 +338,7 @@ export default {
 
 .marginBottom{
   margin-bottom: 20px;
-  
+
 }
 
 </style>

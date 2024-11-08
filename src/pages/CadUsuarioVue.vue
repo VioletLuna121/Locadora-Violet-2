@@ -66,16 +66,17 @@
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
-              <q-input v-model="selectedUser.username" label="Nome" borderless class="InP"/>
+
+              <q-input v-model="selectedUser.id" label="ID" borderless disable class="InP"/>
+              <q-input v-model="selectedUser.name" label="Nome" borderless class="InP"/>
               <q-input v-model="selectedUser.email" label="Email" type="email" borderless class="InP"/>
-              <PasswordInput label="Senha" class="InP" v-model="selectedUser.password" borderless />
 
               <div class="q-gutter-md permission">
                 <q-radio v-model="selectedUser.permission" val="VISITOR" label="VISITOR" color="$primary"/>
                 <q-radio v-model="selectedUser.permission" val="ADMIN" label="ADMIN" color="$primary"/>
               </div>
 
-              <q-btn label="Salvar" class="EditarButtom"/>
+              <q-btn label="Salvar" class="EditarButtom" @click="EditarUser"/>
             </q-card-section>
           </q-card>
         </q-dialog>
@@ -217,27 +218,64 @@ export default {
       }
     };
 
-    const deletarUser = async () => {
+    // Nova função para editar o usuário
+    const EditarUser = async () => {
       try {
         const token = localStorage.getItem('token');
-        const userId = selectedUser.value?.id; // Obtém o ID do usuário
 
-        // Realiza a requisição de exclusão do usuário
-        const response = await api.delete(`/users/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // Chamada PUT para atualizar o usuário
+        const response = await api.put(`/users`,{
 
-        if (response.status === 204) {
-          console.log('Usuário excluído com sucesso.');
-          AbrirDeleteModal.value = false;
-          await BuscarUser(); // Atualiza a lista de usuários
-        } else {
-          console.warn('A API retornou um status inesperado:', response.status);
+            id: selectedUser.value.id,
+            name: selectedUser.value.name,
+            email: selectedUser.value.email,
+            role: selectedUser.value.permission,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+          // Verifica se a atualização foi bem-sucedida
+          if (response.status === 204) {
+            console.log('Usuário atualizado com sucesso.');
+            AbrirModalEdit.value = false; // Fecha o modal de edição
+            await BuscarUser(); // Atualiza a lista de usuários
+          } else {
+            console.warn('A API retornou um status inesperado:', response.status);
+          }
+        } catch (error) {
+          console.error('Erro ao editar usuário:', error.response?.data || error.message);
         }
-      } catch (error) {
-        console.error('Erro ao excluir usuário:', error.response?.data || error.message);
-      }
-    };
+      };
+
+      const deletarUser = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const userId = selectedUser.value?.id;
+
+          if (!userId) {
+            console.error('Erro: ID do usuário não encontrado para exclusão.');
+            return;
+          }
+          console.log(`Iniciando exclusão do usuário com ID: ${userId}`);
+
+          // Chamada para exclusão do usuário
+          const response = await api.delete(`/users/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.status === 204) {
+            console.log('Usuário excluído com sucesso.');
+            AbrirDeleteModal.value = false; // Fecha o modal de exclusão
+            await BuscarUser(); // Atualiza a lista de usuários
+          } else {
+            console.warn(`A API retornou um status inesperado: ${response.status}`);
+          }
+        } catch (error) {
+          console.error('Erro ao excluir usuário:', error.response?.data || error.message);
+        }
+      };
 
     // Funções para abrir modais
     const openModalNew = () => {
@@ -245,7 +283,6 @@ export default {
     };
 
     const viewItem = (row) => {
-      console.log("Visualizando usuário:", row);
       selectedUser.value = row;
       AbrirModalView.value = true;
       BuscarDadosUser(row.id);
@@ -283,7 +320,8 @@ export default {
       BuscarUser,
       deletarUser,
       DadosUser,
-      BuscarDadosUser
+      BuscarDadosUser,
+      EditarUser
 
     };
   }

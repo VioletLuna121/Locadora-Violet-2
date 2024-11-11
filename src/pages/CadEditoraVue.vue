@@ -13,7 +13,7 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Cadastrar Editora</div>
-              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="black"/>
+              <q-btn flat round icon="c lose" @click="JModalNew = false" class="absolute-top-right" color="black"/>
             </q-card-section>
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
@@ -34,16 +34,19 @@
         <!-- Modal para Visualizar Editora -->
         <q-dialog v-model="AbrirModalView" class="JmodalPublisher Sombra" persistent>
           <q-card class="ModalCard">
-            <q-card-section class="CardSectionTitulo">
+            <q-card-section c   lass="CardSectionTitulo">
               <div class="text-h4 tituloModal">Dados da Editora</div>
               <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="black"/>
             </q-card-section>
 
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
+
             <q-card-section class="marginBottom">
-              <q-input v-model="selectedUser.publisher" label="Editora" borderless class="InP" disable />
-              <q-input v-model="selectedUser.email" label="Email" type="email" borderless class="InP" disable />
-              <q-input v-model="selectedUser.telephone" label="Telefone" type="tel" borderless class="InP" disable />
-              <q-input v-model="selectedUser.site" label="Site" borderless class="InP InputView" disable />
+              <q-input v-model="DadosPublisher.id" label="ID" borderless class="InP" disable />
+              <q-input v-model="DadosPublisher.name" label="Editora" borderless class="InP" disable />
+              <q-input v-model="DadosPublisher.email" label="Email" type="email" borderless class="InP" disable />
+              <q-input v-model="DadosPublisher.telephone" label="Telefone" type="tel" borderless class="InP" disable />
+              <q-input v-model="DadosPublisher.site" label="Site" borderless class="InP InputView" disable />
             </q-card-section>
           </q-card>
         </q-dialog>
@@ -51,18 +54,21 @@
         <!-- Modal para Editar a Editora -->
         <q-dialog v-model="AbrirModalEdit" class="JmodalPublisher Sombra" persistent>
           <q-card class="ModalCard">
-            <q-card-section class="CardSectionTitulo CardST2">
+            <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Editar Dados</div>
               <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="black"/>
             </q-card-section>
 
-            <q-card-section>
-              <q-input v-model="selectedUser.publisher" label="Editora" required borderless  class="InP"/>
-              <q-input v-model="selectedUser.email" label="Email" type="email" required borderless  class="InP"/>
-              <q-input v-model="selectedUser.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
-              <q-input v-model="selectedUser.site" label="Site"  borderless  class="InP"/>
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-              <q-btn label="Salvar" color="secondary" class="EditarButtom"/>
+            <q-card-section>
+              <q-input v-model="selectedPublisher.id" label="Editora" disab borderless  class="InP"/>
+              <q-input v-model="selectedPublisher.name" label="Editora" required borderless  class="InP"/>
+              <q-input v-model="selectedPublisher.email" label="Email" type="email" required borderless  class="InP"/>
+              <q-input v-model="selectedPublisher.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
+              <q-input v-model="selectedPublisher.site" label="Site"  borderless  class="InP"/>
+
+              <q-btn label="Salvar" class="EditarButtom" @click="EditarPublisher"/>
             </q-card-section>
           </q-card>
         </q-dialog>
@@ -94,7 +100,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
 import { api } from 'src/boot/axios';
 
@@ -112,20 +118,20 @@ export default {
     };
 
     const viewItem = (row) => {
-      console.log('Visualizando:', row);
-      selectedUser.value = row;
+      BuscarDadosPublisher(row.id);
+      selectedPublisher.value = row;
       AbrirModalView.value = true;
     };
 
     const editItem = (row) => {
       console.log('Editando:', row);
-      selectedUser.value = row;
+      selectedPublisher.value = row;
       AbrirModalEdit.value = true;
     };
 
     const deleteItem = (row) => {
       console.log('Deletando:', row);
-      selectedUser.value = row;
+      selectedPublisher.value = row;
       AbrirDeleteModal.value = true;
     };
 
@@ -133,12 +139,38 @@ export default {
 
     // Dados para a tabela
     const tableColumns = ref([
+      { name: 'id', label: 'ID', align: 'center', field: row => row.id },
       { name: 'name', label: 'name', align: 'center', field: row => row.name },
-      { name: 'email', label: 'Email', align: 'center', field: row => row.email },
       { name: 'telephone', label: 'Telefone', align: 'center', field: row => row.telephone },
       { name: 'site', label: 'Site', align: 'center', field: row => row.site },
+      { name: 'email', label: 'Email', align: 'center', field: row => row.email },
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
+
+      // Função para buscar todos os usuários de uma vez
+      const PagesPublisher = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/publisher`, {
+          params: { size: 1000, sort: 'id', direction: 'ASC' },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Verifique se há dados na resposta
+        if (response.data && response.data.content) {
+          tableData.value = response.data.content; // Atualiza os dados da tabela
+        } else {
+          console.warn('Nenhum dado foi retornado da API.');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar usuários:', error.response?.data || error.message);
+      }
+    };
+
+        // Chame `BuscarUser` ao montar
+        onMounted(() => {
+          PagesPublisher();
+        });
 
     const CadPublisher = async () => {
       try {
@@ -171,9 +203,59 @@ export default {
       }
     };
 
-    
+    const DadosPublisher = ref({}); // Inicializado como objeto vazio para evitar problemas de acesso
 
-    const selectedUser = ref(null);
+    const BuscarDadosPublisher = async (publisherID) =>{
+      try{
+        console.log("Buscando dados da Editora com ID:", publisherID); // Log para depuração
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/publisher/${publisherID}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        DadosPublisher.value = response.data; // Armazena os detalhes da editora
+        console.log("Dados da editora carregados:", DadosPublisher.value); // Log dos dados carregados
+
+        // Abre o modal de visualização após carregar os dados
+        AbrirModalView.value = true;
+      } catch (error) {
+        console.error('Erro ao buscar detalhes da editora:', error.response?.data || error.message);
+      }
+    };
+
+    const EditarPublisher = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        // Chamada PUT para atualizar o usuário
+        const response = await api.put(`/publisher`,{
+
+            id: selectedPublisher.value.id,
+            name: selectedPublisher.value.name,
+            telephone: selectedPublisher.value.telephone,
+            email: selectedPublisher.value.email,
+            site: selectedPublisher.value.site,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+          // Verifica se a atualização foi bem-sucedida
+          if (response.status === 204) {
+            console.log('Editora atualizada com sucesso.');
+            AbrirModalEdit.value = false; // Fecha o modal de edição
+            await PagesPublisher(); // Atualiza a lista de usuários
+          } else {
+            console.warn('A API retornou um status inesperado:', response.status);
+          }
+        } catch (error) {
+          console.error('Erro ao editar editora:', error.response?.data || error.message);
+        }
+      };
+
+
+    const selectedPublisher = ref(null);
 
     const newUser = ref({
       name: '',
@@ -195,11 +277,17 @@ export default {
       deleteItem,
       tableData,
       tableColumns,
-      selectedUser,
+      selectedPublisher,
       newUser,
       password,
       ConfirmDeleteImg,
-      CadPublisher
+      CadPublisher,
+      PagesPublisher,
+      BuscarDadosPublisher,
+      DadosPublisher,
+      EditarPublisher,
+
+
     };
   }
 };
@@ -226,10 +314,6 @@ export default {
   border-radius: 15px !important;
   align-items: center;
   padding-top: 10px;
-}
-
-.CardST2{
-  padding-left: 100px
 }
 
 .JmodalPublisher .tituloModal {
@@ -278,6 +362,8 @@ export default {
   margin-left: 150px;
   margin-top: 20px;
   margin-bottom: 10px;
+  background-color: #82e2e9;
+  color: black;
 }
 
 .DeleteModal {

@@ -58,7 +58,7 @@
         <!-- Modal para Editar Usuário -->
         <q-dialog v-model="AbrirModalEdit" class="JmodalUser Sombra" persistent>
           <q-card class="ModalCard">
-            <q-card-section class="CardSectionTitulo CardST2">
+            <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Editar Dados</div>
               <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="black"/>
             </q-card-section>
@@ -135,15 +135,13 @@ export default {
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
-    const totalPages = ref(0);
-    const currentPage = ref(1); // Página inicial
 
     // Função para buscar todos os usuários de uma vez
     const BuscarUser = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/users`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC' }, // Define um valor alto para size
+          params: { size: 1000, sort: 'id', direction: 'ASC' },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -158,7 +156,7 @@ export default {
       }
     };
 
-        // Chame `fetchUsers` ao montar
+        // Chame `BuscarUser` ao montar
         onMounted(() => {
           BuscarUser();
         });
@@ -315,8 +313,6 @@ export default {
       newUser,
       ConfirmDeleteImg,
       CadNovoUser,
-      totalPages,
-      currentPage,
       BuscarUser,
       deletarUser,
       DadosUser,

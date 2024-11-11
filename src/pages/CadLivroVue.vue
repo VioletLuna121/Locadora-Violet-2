@@ -66,7 +66,7 @@
         <!-- Modal para Editar a Livro -->
         <q-dialog v-model="AbrirModalEdit" class="JmodalBook Sombra" persistent>
           <q-card class="ModalCard">
-            <q-card-section class="CardSectionTitulo CardST2">
+            <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Editar Dados</div>
               <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="white"/>
             </q-card-section>
@@ -223,11 +223,6 @@ export default {
   padding-top: 10px;
   border-radius: 15px !important;
 }
-
-.CardST2{
-  padding-left: 100px
-}
-
 .JmodalBook .tituloModal {
   color: white;
   width: 100%;

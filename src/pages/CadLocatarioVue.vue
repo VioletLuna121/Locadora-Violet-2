@@ -118,8 +118,9 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
+import { api } from '/src/boot/axios';
 
 export default {
   setup() {
@@ -154,21 +155,38 @@ export default {
 
     // Dados para a tabela
     const tableColumns = ref([
+      { name: 'id', label: 'ID', align: 'center', field: row => row.id },
       { name: 'name', label: 'Nome', align: 'center', field: row => row.name },
-      { name: 'email', label: 'Email', align: 'center', field: row => row.email },
       { name: 'telephone', label: 'Telefone', align: 'center', field: row => row.telephone },
-      { name: 'address', label: 'Endereço', align: 'center', field: row => row.address },
-      { name: 'cpf', label: 'CPF', align: 'center', field: row => row.cpf },
+      { name: 'email', label: 'Email', align: 'center', field: row => row.email },
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
-    const tableData = ref([
-      { id: 1, name: 'Sabrina Dayse	', email: 'brina@gmail.com', telephone: '85 9159-6051', address: 'Rua José Goiana AP 17	',cpf:'298.696.876.96' },
-      { id: 2, name: 'Francisco Igor	', email: 'guistico12@gmail.com	', telephone: '85 8764-7048', address: 'Av. Duque de Caxias',cpf:'869.422.535.45' },
-      { id: 3, name: 'Lucas Pereira', email: 'lucas.pereira87@gmail.com', telephone: '(11) 91234-5678	', address: 'Rua das Flores...',cpf:'123.456.232.45' },
-      { id: 4, name: 'Ana Beatriz', email: 'ana.costa01@gmail.com', telephone: '(41) 92345-6789	', address: 'Avenida Paraná, 321...',cpf:'345.678.343.34' },
+    const tableData = ref([]);
 
-    ]);
+     // Função para buscar todos os locatarios de uma vez
+     const PagesRenters = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/renter`, {
+          params: { size: 1000, sort: 'id', direction: 'ASC' },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Verifique se há dados na resposta
+        if (response.data && response.data.content) {
+          tableData.value = response.data.content; // Atualiza os dados da tabela
+        } else {
+          console.warn('Nenhum dado foi retornado da API.');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar editoras:', error.response?.data || error.message);
+      }
+    };
+
+        onMounted(() => {
+          PagesRenters();
+        });
 
     const selectedUser = ref(null);
     const newUser = ref({
@@ -194,7 +212,8 @@ export default {
       selectedUser,
       newUser,
       password,
-      ConfirmDeleteImg
+      ConfirmDeleteImg,
+      PagesRenters
     };
   }
 };

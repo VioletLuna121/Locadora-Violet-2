@@ -13,24 +13,26 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Cadastrar Livro</div>
-              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="white"/>
+              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-form>
                 <div class="form">
                   <div>
                     <q-input v-model="newUser.name" label="Nome" required borderless  class="InP"/>
-                    <q-input v-model="newUser.publisher" label="Editora" required borderless  class="InP"/>
                     <q-input v-model="newUser.author" label="Autor" required borderless  class="InP"/>
+                    <q-input v-model="newUser.totalQuantity" label="Quantidade" type="number" min="1" required borderless  class="InP"/>
                   </div>
 
                   <div>
-                    <q-input v-model="newUser.date" label="Data de Lançamento" type="date" required borderless  class="InP"/>
-                    <q-input v-model="newUser.stock" label="Estoque" type="number" min="0" borderless  class="InP"/>
+                    <q-input v-model="newUser.launchDate" label="Data de Lançamento" type="date" required borderless  class="InP"/>
+                    <q-input v-model="newUser.publisherId" label="Editora Id" type="number" min="1" borderless  class="InP"/>
                   </div>
                 </div>
-                <q-btn type="submit" label="Cadastrar" color="secondary" class="CadastroButtom"/>
+                <q-btn type="submit" label="Cadastrar" class="CadastroButtom" @click="CadBook"/>
               </q-form>
             </q-card-section>
           </q-card>
@@ -41,21 +43,24 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Dados do Livro</div>
-              <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="white"/>
+              <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-form>
                 <div class="form">
                   <div>
-                    <q-input v-model="selectedUser.name" label="Nome" disable borderless  class="InP"/>
-                    <q-input v-model="selectedUser.publisher" label="Editora" disable borderless  class="InP"/>
-                    <q-input v-model="selectedUser.author" label="Autor" disable borderless  class="InP"/>
+                    <q-input v-model="DadosBook.name" label="Nome" disable borderless  class="InP"/>
+                    <q-input v-model="DadosBook.author" label="Autor" disable borderless  class="InP"/>
+                    <q-input v-model="DadosBook.availableQuantity" label="Quant. Disponivel" disable borderless  class="InP"/>
                   </div>
 
                   <div>
-                    <q-input v-model="selectedUser.date" label="Data de Lançamento" type="date" disable borderless  class="InP"/>
-                    <q-input v-model="selectedUser.stock" label="Estoque" type="number" min="0" disable borderless  class="InP"/>
+                    <q-input v-model="DadosBook.inUseQuantity" label="Alugados" disable borderless  class="InP"/>
+                    <q-input v-model="DadosBook.launchDate" label="Data de Lançamento" type="date"  disable borderless  class="InP"/>
+                    <q-input v-model="DadosBook.publisherName" label="Editora" disable borderless  class="InP"/>
                   </div>
                 </div>
               </q-form>
@@ -68,24 +73,27 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Editar Dados</div>
-              <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="white"/>
+              <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-form>
                 <div class="form">
                   <div>
-                    <q-input v-model="selectedUser.name" label="Nome" required borderless  class="InP"/>
-                    <q-input v-model="selectedUser.publisher" label="Editora" required borderless  class="InP"/>
-                    <q-input v-model="selectedUser.author" label="Autor" required borderless  class="InP"/>
+                    <q-input v-model="selectedBook.id" label="ID" disable borderless  class="InP"/>
+                    <q-input v-model="selectedBook.name" label="Nome" required borderless  class="InP"/>
+                    <q-input v-model="selectedBook.author" label="Autor" required borderless  class="InP"/>
                   </div>
 
                   <div>
-                    <q-input v-model="selectedUser.date" label="Data de Lançamento" type="date" required borderless  class="InP"/>
-                    <q-input v-model="selectedUser.stock" label="Estoque" type="number" min="0" borderless  class="InP"/>
+                    <q-input v-model="selectedBook.totalQuantity" label="Estoque" type="number" min="1" required borderless  class="InP"/>
+                    <q-input v-model="selectedBook.launchDate" label="Data de Lançamento" type="date" required borderless class="InP"/>
+                    <q-input v-model="selectedBook.publisherId" label="Editora" type="number" min="1" required borderless  class="InP"/>
                   </div>
                 </div>
-                <q-btn type="submit" label="Cadastrar" color="secondary" class="CadastroButtom"/>
+                <q-btn type="submit" label="Editar" class="CadastroButtom" @click="EditarBook"/>
               </q-form>
             </q-card-section>
           </q-card>
@@ -106,7 +114,7 @@
 
             <q-card-section class=" q-gutter-sm q-pt-none CardButtonDelete">
               <div class="q-gutter-md buttonsDelete">
-                <q-btn label="Sim" color="red" class="Button"/>
+                <q-btn label="Sim" color="red" class="Button" @click="deletarBook"/>
                 <q-btn label="Não" color="dark" @click="AbrirDeleteModal = (false)" class="Button"/>
               </div>
             </q-card-section>
@@ -118,8 +126,9 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted  } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
+import { api } from 'src/boot/axios';
 
 export default {
   setup() {
@@ -135,48 +144,182 @@ export default {
     };
 
     const viewItem = (row) => {
-      console.log('Visualizando:', row);
-      selectedUser.value = row;
+      BuscarDadosBook(row.id);
+      selectedBook.value = row;
       AbrirModalView.value = true;
     };
 
     const editItem = (row) => {
       console.log('Editando:', row);
-      selectedUser.value = row;
+      selectedBook.value = row;
       AbrirModalEdit.value = true;
     };
 
     const deleteItem = (row) => {
       console.log('Deletando:', row);
-      selectedUser.value = row;
+      selectedBook.value = row;
       AbrirDeleteModal.value = true;
     };
 
     // Dados para a tabela
     const tableColumns = ref([
+      { name: 'id', label: 'ID', align: 'center', field: row => row.id },
       { name: 'name', label: 'Nome', align: 'center', field: row => row.name },
-      { name: 'publisher', label: 'Editora', align: 'center', field: row => row.publisher },
       { name: 'author', label: 'Autor', align: 'center', field: row => row.author },
-      { name: 'date', label: 'Data de Lançamento', align: 'center', field: row => row.date },
-      { name: 'stock', label: 'Estoque', align: 'center', field: row => row.stock },
+      { name: 'totalQuantity', label: 'Estoque', align: 'center', field: row => row.totalQuantity },
+      { name: 'availableQuantity', label: 'Quant. Disponiveis', align: 'center', field: row => row.availableQuantity },
+      { name: 'inUseQuantity', label: 'Alugados', align: 'center', field: row => row.inUseQuantity },
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
-    const tableData = ref([
-      { id: 1, name: 'Quinze Dias	', publisher: 'Globo Alt ', author: 'Vitor Martins	', date: '02/06/2017',stock:'2' },
-      { id: 2, name: '1984', publisher: '	Companhia das Letras	', author: 'George Orwell', date: '08/06/1949',stock:'3' },
-      { id: 3, name: 'Dom Quixote', publisher: 'Editora 34', author: '	Miguel de Cervantes', date: '16/01/1605',stock:'7' },
-      { id: 4, name: 'Cem Anos de Solidão	', publisher: 'Record', author: 'Gabriel García Márquez', date: '30/05/1967',stock:'3' },
+    const tableData = ref([]);
 
-    ]);
+    // Função para buscar todos as editoras de uma vez
+    const PagesBook = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/book`, {
+          params: { size: 1000, sort: 'id', direction: 'ASC' },
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    const selectedUser = ref(null);
+        // Verifique se há dados na resposta
+        if (response.data && response.data.content) {
+          tableData.value = response.data.content; // Atualiza os dados da tabela
+        } else {
+          console.warn('Nenhum dado foi retornado da API.');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar livros:', error.response?.data || error.message);
+      }
+    };
+
+        // Chame `BuscarUser` ao montar
+        onMounted(() => {
+          PagesBook();
+        });
+
+        const CadBook = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const response = await api.post('/book',{
+
+          name: newUser.value.name,
+          author: newUser.value.author,
+          totalQuantity: newUser.value.totalQuantity,
+          launchDate: newUser.value.launchDate,
+          publisherId: newUser.value.publisherId,
+
+        },
+        {
+          headers: {Authorization: `Bearer ${token}`}
+        }
+        );
+
+        if (response.status === 201) {
+
+        // Fechar o modal e limpar o formulário
+        JModalNew.value = false;
+        newUser.value = {
+          name: '',
+          author: '',
+          totalQuantity:'',
+          launchDate:'',
+          publisherId:'', };
+          await PagesBook();
+        }
+      } catch (error) {
+        console.error('Erro ao cadastrar usuário:', error.response?.data || error.message);
+      }
+    };
+
+    const DadosBook = ref({}); // Inicializado como objeto vazio para evitar problemas de acesso
+
+    const BuscarDadosBook = async (bookID) => {
+  try {
+    console.log("Buscando dados do livro com ID:", bookID);
+    const token = localStorage.getItem('token');
+    const response = await api.get(`/book/${bookID}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    DadosBook.value = response.data;
+    console.log("Dados do livro carregados:", DadosBook.value);
+
+    AbrirModalView.value = true;
+    } catch (error) {
+      console.error('Erro ao buscar detalhes do livro:', error.response?.data || error.message);
+    }
+  };
+
+    const EditarBook = async () => {
+        try {
+          const token = localStorage.getItem('token');
+
+          // Chamada PUT para atualizar o usuário
+          const response = await api.put(`/book`,{
+
+              id: selectedBook.value.id,
+              name: selectedBook.value.name,
+              author: selectedBook.value.author,
+              totalQuantity: selectedBook.value.totalQuantity,
+              launchDate: selectedBook.value.launchDate,
+              publisherId: selectedBook.value.publisherId,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+            // Verifica se a atualização foi bem-sucedida
+            if (response.status === 204) {
+              console.log('Editora atualizada com sucesso.');
+              AbrirModalEdit.value = false; // Fecha o modal de edição
+              await PagesBook(); // Atualiza a lista de usuários
+            } else {
+              console.warn('A API retornou um status inesperado:', response.status);
+            }
+          } catch (error) {
+            console.error('Erro ao editar editora:', error.response?.data || error.message);
+          }
+        };
+
+        const deletarBook = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const bookID = selectedBook.value?.id;
+
+          if (!bookID) {
+            console.error('Erro: ID do livro não encontrado para exclusão.');
+            return;
+          }
+          console.log(`Iniciando exclusão do livro com ID: ${bookID}`);
+
+          // Chamada para exclusão do livro
+          const response = await api.delete(`/book/${bookID}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.status === 204) {
+            console.log('Livro excluída com sucesso.');
+            AbrirDeleteModal.value = false; // Fecha o modal de exclusão
+            await PagesBook(); // Atualiza a lista do livro
+          } else {
+            console.warn(`A API retornou um status inesperado: ${response.status}`);
+          }
+        } catch (error) {
+          console.error('Erro ao excluir livro:', error.response?.data || error.message);
+        }
+      };
+
+    const selectedBook = ref(null);
     const newUser = ref({
       name: '',
-      publisher: '',
-      author:'',
-      date:'',
-      stock:'',
+      author: '',
+      totalQuantity:'',
+      launchDate:'',
+      publisherId:'',
     });
     const password = ref('');
 
@@ -191,10 +334,16 @@ export default {
       deleteItem,
       tableData,
       tableColumns,
-      selectedUser,
+      selectedBook,
       newUser,
       password,
-      ConfirmDeleteImg
+      ConfirmDeleteImg,
+      PagesBook,
+      CadBook,
+      BuscarDadosBook,
+      EditarBook,
+      DadosBook,
+      deletarBook
     };
   }
 };
@@ -216,7 +365,7 @@ export default {
 }
 
 .JmodalBook .CardSectionTitulo {
-  background-color: #333333;
+  background-color: white;
   height: 60px;
   justify-content: center;
   align-items: center;
@@ -224,14 +373,14 @@ export default {
   border-radius: 15px !important;
 }
 .JmodalBook .tituloModal {
-  color: white;
+  color: black;
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .JmodalBook .ModalCard {
-  background-color: #82E2E9;
+  background-color: white;
   min-width: 50%;
   border: 2px solid black;
   border-radius: 20px;
@@ -255,7 +404,7 @@ export default {
   margin-top: 20px;
   border-radius: 10px;
   background-color: white;
-  border: solid 1px black;
+  border: solid 2px rgba(0, 0, 0, 0.550);
   padding-left: 10px;
   width: 250px;
   height: 55px;
@@ -270,12 +419,7 @@ export default {
   margin-left: 40%;
   margin-bottom: 10px;
   margin-top: 0px;
-}
-
-.EditarButtom{
-  margin-left: 150px;
-  margin-top: 20px;
-  margin-bottom: 10px;
+  background-color: #82e2e9;
 }
 
 .DeleteModal {

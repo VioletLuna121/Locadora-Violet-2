@@ -13,7 +13,7 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Cadastrar Editora</div>
-              <q-btn flat round icon="c lose" @click="JModalNew = false" class="absolute-top-right" color="black"/>
+              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="black"/>
             </q-card-section>
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
@@ -62,7 +62,7 @@
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
-              <q-input v-model="selectedPublisher.id" label="Editora" disab borderless  class="InP"/>
+              <q-input v-model="selectedPublisher.id" label="Editora" disable borderless  class="InP"/>
               <q-input v-model="selectedPublisher.name" label="Editora" required borderless  class="InP"/>
               <q-input v-model="selectedPublisher.email" label="Email" type="email" required borderless  class="InP"/>
               <q-input v-model="selectedPublisher.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
@@ -88,7 +88,7 @@
 
             <q-card-section class=" q-gutter-sm q-pt-none CardButtonDelete">
               <div class="q-gutter-md buttonsDelete">
-                <q-btn label="Sim" color="red" class="Button"/>
+                <q-btn label="Sim" color="red" class="Button" @click="deletarPublisher"/>
                 <q-btn label="Não" color="dark" @click="AbrirDeleteModal = (false)" class="Button"/>
               </div>
             </q-card-section>
@@ -147,7 +147,7 @@ export default {
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
-      // Função para buscar todos os usuários de uma vez
+      // Função para buscar todos as editoras de uma vez
       const PagesPublisher = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -163,7 +163,7 @@ export default {
           console.warn('Nenhum dado foi retornado da API.');
         }
       } catch (error) {
-        console.error('Erro ao buscar usuários:', error.response?.data || error.message);
+        console.error('Erro ao buscar editoras:', error.response?.data || error.message);
       }
     };
 
@@ -254,6 +254,34 @@ export default {
         }
       };
 
+      const deletarPublisher = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const publisherID = selectedPublisher.value?.id;
+
+          if (!publisherID) {
+            console.error('Erro: ID da editora não encontrado para exclusão.');
+            return;
+          }
+          console.log(`Iniciando exclusão da editora com ID: ${publisherID}`);
+
+          // Chamada para exclusão do usuário
+          const response = await api.delete(`/publisher/${publisherID}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.status === 204) {
+            console.log('Editora excluída com sucesso.');
+            AbrirDeleteModal.value = false; // Fecha o modal de exclusão
+            await PagesPublisher(); // Atualiza a lista de usuários
+          } else {
+            console.warn(`A API retornou um status inesperado: ${response.status}`);
+          }
+        } catch (error) {
+          console.error('Erro ao excluir usuário:', error.response?.data || error.message);
+        }
+      };
+
 
     const selectedPublisher = ref(null);
 
@@ -286,6 +314,7 @@ export default {
       BuscarDadosPublisher,
       DadosPublisher,
       EditarPublisher,
+      deletarPublisher,
 
 
     };
@@ -342,7 +371,7 @@ export default {
   margin-top: 20px;
   border-radius: 10px;
   background-color: white;
-  border: solid 1px black;
+  border: solid 2px rgba(0, 0, 0, 0.550);
   padding-left: 10px;
 }
 

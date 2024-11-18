@@ -71,8 +71,9 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
+import { api } from 'src/boot/axios';
 
 export default {
   setup() {
@@ -107,19 +108,40 @@ export default {
 
     // Dados para a tabela
     const tableColumns = ref([
-      { name: 'name', label: 'Nome', align: 'center', field: row => row.name },
-      { name: 'date', label: 'Data de Lançamento', align: 'center', field: row => row.date },
-      { name: 'book', label: 'Livro', align: 'center', field: row => row.book },
+      { name: 'renterName', label: 'Locatário', align: 'center', field: row => row.renterName },
+      { name: 'bookName', label: 'Livro alugado', align: 'center', field: row => row.bookName },
+      { name: 'status', label: 'status', align: 'center', field: row => row.status },
+      { name: 'deadLineDate', label: 'Data Limite', align: 'center', field: row => row.deadLineDate },
+      { name: 'rentDate', label: 'Data do Aluguel', align: 'center', field: row => row.rentDate },
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
-    const tableData = ref([
-      { id: 1, name: 'Brinakkjj', date: '23/07/2024', book: 'Quinze dias',  },
-      { id: 2, name: 'Guistico', date: '03/08/2024', book: 'Pequena coreografia de um adeus', },
-      { id: 3, name: 'Luquinhas', date: '26/08/2024', book: '1984', },
-      { id: 4, name: 'Mariana123', date: '26/09/2024', book: 'Dom Quixote',},
+    const tableData = ref([]);
 
-    ]);
+     // Função para buscar todos as editoras de uma vez
+     const PagesRent = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/rent`, {
+          params: { size: 1000, sort: 'id', direction: 'ASC' },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Verifique se há dados na resposta
+        if (response.data && response.data.content) {
+          tableData.value = response.data.content; // Atualiza os dados da tabela
+        } else {
+          console.warn('Nenhum dado foi retornado da API.');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar Alugueis:', error.response?.data || error.message);
+      }
+    };
+
+        // Chame `BuscarUser` ao montar
+        onMounted(() => {
+          PagesRent();
+        });
 
     const selectedUser = ref(null);
       const newUser = ref({

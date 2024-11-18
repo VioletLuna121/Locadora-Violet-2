@@ -13,8 +13,10 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Cadastrar Locatário</div>
-              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="white"/>
+              <q-btn flat round icon="close" @click="JModalNew = false" class="absolute-top-right" color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-form>
@@ -30,7 +32,7 @@
                     <q-input v-model="newUser.cpf" label="CPF" borderless  class="InP"/>
                   </div>
                 </div>
-                <q-btn type="submit" label="Cadastrar" color="secondary" class="CadastroButtom"/>
+                <q-btn type="submit" label="Cadastrar" class="CadastroButtom" @click="CadRenters"/>
               </q-form>
             </q-card-section>
           </q-card>
@@ -41,21 +43,23 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Dados do Livro</div>
-              <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="white"/>
+              <q-btn flat round icon="close" @click="AbrirModalView = false" class="absolute-top-right" color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-form>
                 <div class="form">
                   <div>
-                    <q-input v-model="selectedUser.name" label="Nome" disable borderless  class="InP"/>
-                    <q-input v-model="selectedUser.email" label="Email" type="email" disable borderless  class="InP"/>
-                    <q-input v-model="selectedUser.telephone" label="Telefone" type="tel" disable borderless  class="InP"/>
+                    <q-input v-model="DadosRenters.name" label="Nome" disable borderless  class="InP"/>
+                    <q-input v-model="DadosRenters.email" label="Email" type="email" disable borderless  class="InP"/>
+                    <q-input v-model="DadosRenters.telephone" label="Telefone" type="tel" disable borderless  class="InP"/>
                   </div>
 
                   <div>
-                    <q-input v-model="selectedUser.address" label="Endereço" disable borderless  class="InP"/>
-                    <q-input v-model="selectedUser.cpf" label="CPF"  disable borderless  class="InP"/>
+                    <q-input v-model="DadosRenters.address" label="Endereço" disable borderless  class="InP"/>
+                    <q-input v-model="DadosRenters.cpf" label="CPF"  disable borderless  class="InP"/>
                   </div>
                 </div>
               </q-form>
@@ -68,24 +72,27 @@
           <q-card class="ModalCard">
             <q-card-section class="CardSectionTitulo">
               <div class="text-h4 tituloModal">Editar Dados</div>
-              <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="white"/>
+              <q-btn flat round icon="close" @click="AbrirModalEdit = false" class="absolute-top-right"  color="black"/>
             </q-card-section>
+
+            <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
             <q-card-section>
               <q-form>
                 <div class="form">
                   <div>
-                    <q-input v-model="selectedUser.name" label="Nome" required borderless  class="InP"/>
-                    <q-input v-model="selectedUser.email" label="Email" type="email" required borderless  class="InP"/>
-                    <q-input v-model="selectedUser.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
+                    <q-input v-model="selectedRenters.id" label="ID" disable borderless  class="InP"/>
+                    <q-input v-model="selectedRenters.name" label="Nome" required borderless  class="InP"/>
+                    <q-input v-model="selectedRenters.email" label="Email" type="email" required borderless  class="InP"/>
                   </div>
 
                   <div>
-                    <q-input v-model="selectedUser.address" label="Endereço" required borderless  class="InP"/>
-                    <q-input v-model="selectedUser.cpf" label="CPF" borderless  class="InP"/>
+                    <q-input v-model="selectedRenters.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
+                    <q-input v-model="selectedRenters.address" label="Endereço" required borderless  class="InP"/>
+                    <q-input v-model="selectedRenters.cpf" label="CPF" borderless  class="InP"/>
                   </div>
                 </div>
-                <q-btn type="submit" label="Cadastrar" color="secondary" class="CadastroButtom"/>
+                <q-btn type="submit" label="Editar" class="CadastroButtom" @click="EditarRenters"/>
               </q-form>
             </q-card-section>
           </q-card>
@@ -106,7 +113,7 @@
 
             <q-card-section class=" q-gutter-sm q-pt-none CardButtonDelete">
               <div class="q-gutter-md buttonsDelete">
-                <q-btn label="Sim" color="red" class="Button"/>
+                <q-btn label="Sim" color="red" class="Button" @click="deletarRenters"/>
                 <q-btn label="Não" color="dark" @click="AbrirDeleteModal = (false)" class="Button"/>
               </div>
             </q-card-section>
@@ -136,20 +143,20 @@ export default {
     };
 
     const viewItem = (row) => {
-      console.log('Visualizando:', row);
-      selectedUser.value = row;
+      BuscarDadosRenters(row.id);
+      selectedRenters.value = row;
       AbrirModalView.value = true;
     };
 
     const editItem = (row) => {
       console.log('Editando:', row);
-      selectedUser.value = row;
+      selectedRenters.value = row;
       AbrirModalEdit.value = true;
     };
 
     const deleteItem = (row) => {
       console.log('Deletando:', row);
-      selectedUser.value = row;
+      selectedRenters.value = row;
       AbrirDeleteModal.value = true;
     };
 
@@ -188,7 +195,121 @@ export default {
           PagesRenters();
         });
 
-    const selectedUser = ref(null);
+    const CadRenters = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const response = await api.post('/renter',{
+
+          name: newUser.value.name,
+          email: newUser.value.email,
+          telephone: newUser.value.telephone,
+          address: newUser.value.address,
+          cpf: newUser.value.cpf,
+
+        },
+        {
+          headers: {Authorization: `Bearer ${token}`}
+        }
+        );
+
+        if (response.status === 201) {
+
+        // Fechar o modal e limpar o formulário
+        JModalNew.value = false;
+        newUser.value = {
+          name: '',
+          email: '',
+          telephone:'',
+          address:'',
+          cpf:'', };
+        }
+        await PagesRenters();
+      } catch (error) {
+        console.error('Erro ao cadastrar Locatário:', error.response?.data || error.message);
+      }
+    };
+
+    const DadosRenters = ref({}); // Inicializado como objeto vazio para evitar problemas de acesso
+
+    const BuscarDadosRenters = async (rentersID) => {
+      try {
+        console.log("Buscando dados do locatário com ID:", rentersID);
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/renter/${rentersID}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        DadosRenters.value = response.data;
+        console.log("Dados do Locatário carregados:", DadosRenters.value);
+
+        AbrirModalView.value = true;
+        } catch (error) {
+          console.error('Erro ao buscar detalhes do locatário:', error.response?.data || error.message);
+        }
+      };
+
+      const EditarRenters = async () => {
+        try {
+          const token = localStorage.getItem('token');
+
+          // Chamada PUT para atualizar o usuário
+          const response = await api.put(`/renter`,{
+
+              id: selectedRenters.value.id,
+              name: selectedRenters.value.name,
+              email: selectedRenters.value.email,
+              telephone: selectedRenters.value.telephone,
+              address: selectedRenters.value.address,
+              cpf: selectedRenters.value.cpf,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+            // Verifica se a atualização foi bem-sucedida
+            if (response.status === 204) {
+              console.log('Editora atualizada com sucesso.');
+              AbrirModalEdit.value = false; // Fecha o modal de edição
+              await PagesRenters(); // Atualiza a lista de usuários
+            } else {
+              console.warn('A API retornou um status inesperado:', response.status);
+            }
+          } catch (error) {
+            console.error('Erro ao editar locatário:', error.response?.data || error.message);
+          }
+        };
+
+      const deletarRenters = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const rentersID = selectedRenters.value?.id;
+
+          if (!rentersID) {
+            console.error('Erro: ID do locatário não encontrado para exclusão.');
+            return;
+          }
+          console.log(`Iniciando exclusão do livro com ID: ${rentersID}`);
+
+          // Chamada para exclusão do locatário
+          const response = await api.delete(`/renter/${rentersID}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.status === 204) {
+            console.log('Locatário excluída com sucesso.');
+            AbrirDeleteModal.value = false; // Fecha o modal de exclusão
+            await PagesRenters(); // Atualiza a lista do livro
+          } else {
+            console.warn(`A API retornou um status inesperado: ${response.status}`);
+          }
+        } catch (error) {
+          console.error('Erro ao excluir locatário:', error.response?.data || error.message);
+        }
+      };
+
+    const selectedRenters = ref(null);
     const newUser = ref({
       name: '',
       email: '',
@@ -209,11 +330,16 @@ export default {
       deleteItem,
       tableData,
       tableColumns,
-      selectedUser,
+      selectedRenters,
       newUser,
       password,
       ConfirmDeleteImg,
-      PagesRenters
+      PagesRenters,
+      CadRenters,
+      BuscarDadosRenters,
+      DadosRenters,
+      EditarRenters,
+      deletarRenters
     };
   }
 };
@@ -235,7 +361,7 @@ export default {
 }
 
 .JmodalRenter .CardSectionTitulo {
-  background-color: #333333;
+  background-color: #ffffff;
   height: 60px;
   justify-content: center;
   align-items: center;
@@ -244,14 +370,14 @@ export default {
 }
 
 .JmodalRenter .tituloModal {
-  color: white;
+  color: black;
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .JmodalRenter .ModalCard {
-  background-color: #00234f;
+  background-color: #ffffff;
   min-width: 50%;
   border: 2px solid black;
   border-radius: 20px;
@@ -275,7 +401,7 @@ export default {
   margin-top: 20px;
   border-radius: 10px;
   background-color: white;
-  border: solid 1px black;
+  border: solid 2px rgba(0, 0, 0, 0.550);
   padding-left: 10px;
   width: 250px;
   height: 55px;
@@ -286,12 +412,13 @@ export default {
   margin-bottom: 20px;
 }
 
-.CadastroButtom {
+.JmodalRenter .CadastroButtom {
   margin-left: 40%;
   margin-bottom: 10px;
+  background-color: #82e2e9;
 }
 
-.EditarButtom{
+.JmodalRenter .EditarButtom{
   margin-left: 150px;
   margin-top: 20px;
   margin-bottom: 10px;

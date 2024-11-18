@@ -199,7 +199,7 @@ export default {
           PagesBook();
         });
 
-        const CadBook = async () => {
+    const CadBook = async () => {
       try {
         const token = localStorage.getItem('token');
 
@@ -227,8 +227,8 @@ export default {
           totalQuantity:'',
           launchDate:'',
           publisherId:'', };
-          await PagesBook();
         }
+        await PagesBook();
       } catch (error) {
         console.error('Erro ao cadastrar usuário:', error.response?.data || error.message);
       }
@@ -415,7 +415,7 @@ export default {
   margin-bottom: 20px;
 }
 
-.CadastroButtom {
+.JmodalBook .CadastroButtom {
   margin-left: 40%;
   margin-bottom: 10px;
   margin-top: 0px;

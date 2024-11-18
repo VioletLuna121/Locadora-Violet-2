@@ -380,14 +380,14 @@ export default {
   margin-bottom: 20px;
 }
 
-.CadastroButtom {
+.JmodalPublisher .CadastroButtom {
   margin-left: 130px;
   margin-top: 25px;
   margin-bottom: 10px;
   background-color: #82e2e9;
 }
 
-.EditarButtom{
+.JmodalPublisher .EditarButtom{
   margin-left: 150px;
   margin-top: 20px;
   margin-bottom: 10px;

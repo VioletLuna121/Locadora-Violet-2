@@ -29,7 +29,7 @@
 
                   <div>
                     <q-input v-model="newUser.launchDate" label="Data de Lançamento" type="date" required borderless  class="InP"/>
-                    <q-input v-model="newUser.publisherId" label="Editora Id" type="number" min="1" borderless  class="InP"/>
+                    <q-select v-model="newUser.publisherId" :options="publishers.map(p => ({ label: p.name, value: Number(p.id) }))" label="Editora" class="InP" borderless required/>
                   </div>
                 </div>
                 <q-btn type="submit" label="Cadastrar" class="CadastroButtom" @click="CadBook"/>
@@ -90,10 +90,10 @@
                   <div>
                     <q-input v-model="selectedBook.totalQuantity" label="Estoque" type="number" min="1" required borderless  class="InP"/>
                     <q-input v-model="selectedBook.launchDate" label="Data de Lançamento" type="date" required borderless class="InP"/>
-                    <q-input v-model="selectedBook.publisherId" label="Editora" type="number" min="1" required borderless  class="InP"/>
+                    <q-select v-model="selectedBook.publisherId" :options="publishers.map(p => ({ label: p.name, value: Number(p.id) }))" label="Editora" class="InP" borderless required/>
                   </div>
                 </div>
-                <q-btn type="submit" label="Editar" class="CadastroButtom" @click="EditarBook"/>
+                <q-btn label="Editar" class="CadastroButtom" @click="EditarBook"/>
               </q-form>
             </q-card-section>
           </q-card>
@@ -141,6 +141,7 @@ export default {
     // Funções para abrir modais
     const openModalNew = () => {
       JModalNew.value = true;
+      BuscarEditoras();
     };
 
     const viewItem = (row) => {
@@ -153,6 +154,7 @@ export default {
       console.log('Editando:', row);
       selectedBook.value = row;
       AbrirModalEdit.value = true;
+      BuscarEditoras();
     };
 
     const deleteItem = (row) => {
@@ -202,6 +204,14 @@ export default {
     const CadBook = async () => {
       try {
         const token = localStorage.getItem('token');
+
+        console.log("Dados de cadastro do livro:", {
+          name: newUser.value.name,
+          author: newUser.value.author,
+          totalQuantity: newUser.value.totalQuantity,
+          launchDate: newUser.value.launchDate,
+          publisherId: newUser.value.publisherId,
+         });
 
         const response = await api.post('/book',{
 
@@ -313,6 +323,30 @@ export default {
         }
       };
 
+      const publishers = ref([]);
+
+      const BuscarEditoras = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await api.get(`/publisher`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data && response.data.content) {
+          publishers.value = response.data.content; // Atualiza os dados da tabela
+        } else {
+          console.warn('Nenhum dado foi retornado da API.');
+        }
+
+        } catch (error) {
+          console.error('Erro ao buscar editoras:', error);
+        }
+      };
+
+      onMounted(() => {
+        BuscarEditoras();
+      });
+
     const selectedBook = ref(null);
     const newUser = ref({
       name: '',
@@ -343,7 +377,9 @@ export default {
       BuscarDadosBook,
       EditarBook,
       DadosBook,
-      deletarBook
+      deletarBook,
+      publishers,
+      BuscarEditoras
     };
   }
 };

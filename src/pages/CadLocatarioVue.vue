@@ -4,7 +4,7 @@
       <q-page class="PPage">
         <div class="TCima">
           <NovoButton @click="openModalNew" class="NButtom"/>
-          <BarraPesquisa class="BPesquisa"/>
+          <BarraPesquisa class="BPesquisa"  v-model="BPesquisarRenters" @input="PagesRenters"/>
         </div>
         <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
 
@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
 import { api } from '/src/boot/axios';
 
@@ -136,6 +136,7 @@ export default {
     const AbrirModalView = ref(false);
     const AbrirModalEdit = ref(false);
     const AbrirDeleteModal = ref(false);
+    const BPesquisarRenters = ref('');
 
     // Funções para abrir modais
     const openModalNew = () => {
@@ -176,7 +177,7 @@ export default {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/renter`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC' },
+          params: { size: 1000, sort: 'id', direction: 'ASC', search:BPesquisarRenters.value },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -194,6 +195,11 @@ export default {
         onMounted(() => {
           PagesRenters();
         });
+
+        watch(BPesquisarRenters, () => {
+          PagesRenters(); // Recarrega a pesquisa sempre que o termo for alterado
+        });
+
 
     const CadRenters = async () => {
       try {
@@ -339,7 +345,8 @@ export default {
       BuscarDadosRenters,
       DadosRenters,
       EditarRenters,
-      deletarRenters
+      deletarRenters,
+      BPesquisarRenters
     };
   }
 };

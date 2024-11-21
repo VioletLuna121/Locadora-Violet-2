@@ -3,8 +3,11 @@
     <q-page-container>
       <q-page class="PPage">
         <div class="TCima">
-          <NovoButton @click="openModalNew" class="NButtom"/>
-          <BarraPesquisa class="BPesquisa"/>
+          <div style="flex-direction: row; display: flex; gap: 10px">
+            <NovoButton @click="openModalNew" class="NButtom"/>
+            <q-select class="filtro" borderless/>
+          </div>
+          <BarraPesquisa class="BPesquisa"  v-model="BPesquisarRent" @input="PagesRent"/>
         </div>
         <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{ return:returnItem}"/>
 
@@ -20,8 +23,29 @@
 
             <q-card-section>
               <q-form>
-                <q-input v-model="newUser.renterId" label="Nome do Locatário" required borderless  class="InP"/>
-                <q-input v-model="newUser.bookId" label="Nome do Livro" required borderless  class="InP"/>
+                <q-select
+                v-model="newUser.renterId"
+                :options="renter"
+                option-label="name"
+                option-value="id"
+                emit-value
+                map-options
+                label="Nome do Locatário"
+                class="InP"
+                borderless
+                required/>
+
+                <q-select
+                v-model="newUser.bookId"
+                :options="book"
+                option-label="name"
+                option-value="id"
+                emit-value
+                map-options
+                label="Nome do Livro"
+                class="InP"
+                borderless
+                required/>
                 <q-input v-model="newUser.deadline" label="Prazo de Entrega" type="date" required borderless  class="InP"/>
 
                 <q-btn type="submit" label="Cadastrar" class="CadastroButtom" @click="CadRent"/>
@@ -58,7 +82,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import ConfirmDeleteImg from '../assets/Delete_Confirmed.png';
 import { api } from 'src/boot/axios';
 
@@ -68,10 +92,13 @@ export default {
     const JModalNew = ref(false);
     const AbrirDevolucaoModal = ref(false);
     const selectedRentId = ref(null);
+    const BPesquisarRent = ref('');
 
     // Funções para abrir modais
     const openModalNew = () => {
       JModalNew.value = true;
+      BuscarLocatario();
+      BuscarLivro();
     };
 
     const returnItem = (row) => {
@@ -97,7 +124,7 @@ export default {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/rent`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC' },
+          params: { size: 1000, sort: 'id', direction: 'ASC', search:BPesquisarRent.value },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -117,9 +144,15 @@ export default {
           PagesRent();
         });
 
+        watch(BPesquisarRent, () => {
+          PagesRent(); // Recarrega a pesquisa sempre que o termo for alterado
+        });
+
     const CadRent = async () => {
       try {
         const token = localStorage.getItem('token');
+
+        console.log('Dados do aluguel:', newUser.value);
 
         const response = await api.post('/rent',{
 
@@ -169,9 +202,61 @@ export default {
 
     onMounted(PagesRent);
 
+    const renter = ref([]);
+
+    const BuscarLocatario = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/renter`, {
+        params: { size: 1000 },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data && response.data.content) {
+        renter.value = response.data.content; // Atualiza os dados da tabela
+        console.log('Locatários:', renter.value); // Verifique se os dados estão corretos
+      } else {
+        console.warn('Nenhum dado foi retornado da API.');
+      }
+
+      } catch (error) {
+        console.error('Erro ao buscar editoras:', error);
+      }
+    };
+
+    onMounted(() => {
+      BuscarLocatario();
+    });
+
+    const book = ref([]);
+
+    const BuscarLivro = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/book`, {
+        params: { size: 1000 },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data && response.data.content) {
+        book.value = response.data.content; // Atualiza os dados da tabela
+        console.log('Livros:', book.value); // Verifique se os dados estão corretos
+      } else {
+        console.warn('Nenhum dado foi retornado da API.');
+      }
+
+      } catch (error) {
+        console.error('Erro ao buscar editoras:', error);
+      }
+    };
+
+    onMounted(() => {
+      BuscarLivro();
+    });
+
       const newUser = ref({
-        renterId: '',
-        bookId: '',
+        renterId: null,
+        bookId: null,
         deadline:'',
       });
     const password = ref('');
@@ -189,7 +274,12 @@ export default {
       ConfirmDeleteImg,
       PagesRent,
       CadRent,
-      DevolucaoRent
+      DevolucaoRent,
+      BuscarLocatario,
+      renter,
+      BuscarLivro,
+      book,
+      BPesquisarRent
     };
   }
 };
@@ -321,6 +411,13 @@ export default {
 
 .padding_zero{
   padding: 0px;
+}
+
+.filtro{
+  border: 1px solid black;
+  border-radius: 15px;
+  width: 120px;
+  height: 39px;
 }
 
 </style>

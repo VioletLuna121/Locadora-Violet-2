@@ -4,7 +4,7 @@
       <q-page class="PPage">
         <div class="TCima">
           <NovoButton @click="openModalNew" class="NButtom"/>
-          <BarraPesquisa class="BPesquisa"/>
+          <BarraPesquisa class="BPesquisa"  v-model="BPesquisarUser" @input="BuscarUser"/>
         </div>
         <TabelaGeral :rows="tableData" :columns="tableColumns"  class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
 
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
 import { api } from 'src/boot/axios';
 
@@ -119,6 +119,7 @@ export default {
     const AbrirModalView = ref(false);
     const AbrirModalEdit = ref(false);
     const AbrirDeleteModal = ref(false);
+    const BPesquisarUser = ref('');
 
     const newUser = ref({
       username: '',
@@ -141,7 +142,7 @@ export default {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/users`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC' },
+          params: { size: 1000, sort: 'id', direction: 'ASC',search: BPesquisarUser.value, },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -157,10 +158,13 @@ export default {
     };
 
         // Chame `BuscarUser` ao montar
-        onMounted(() => {
-          BuscarUser();
-        });
+      onMounted(() => {
+        BuscarUser();
+      });
 
+      watch(BPesquisarUser, () => {
+        BuscarUser(); // Recarrega a pesquisa sempre que o termo for alterado
+      });
 
     // Cadastro de novo usuário
     const CadNovoUser = async () => {
@@ -317,7 +321,8 @@ export default {
       deletarUser,
       DadosUser,
       BuscarDadosUser,
-      EditarUser
+      EditarUser,
+      BPesquisarUser
 
     };
   }

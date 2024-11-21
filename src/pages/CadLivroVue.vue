@@ -4,7 +4,7 @@
       <q-page class="PPage">
         <div class="TCima">
           <NovoButton @click="openModalNew" class="NButtom"/>
-          <BarraPesquisa class="BPesquisa"/>
+          <BarraPesquisa class="BPesquisa"  v-model="BPesquisarBook" @input="PagesBook"/>
         </div>
         <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
 
@@ -29,7 +29,17 @@
 
                   <div>
                     <q-input v-model="newUser.launchDate" label="Data de Lançamento" type="date" required borderless  class="InP"/>
-                    <q-select v-model="newUser.publisherId" :options="publishers.map(p => ({ label: p.name, value: Number(p.id) }))" label="Editora" class="InP" borderless required/>
+                    <q-select
+                    v-model="newUser.publisherId"
+                    :options="publishers"
+                    option-label="name"
+                    option-value="id"
+                    emit-value
+                    map-options
+                    label="Editora"
+                    class="InP"
+                    borderless
+                    required/>
                   </div>
                 </div>
                 <q-btn type="submit" label="Cadastrar" class="CadastroButtom" @click="CadBook"/>
@@ -90,7 +100,17 @@
                   <div>
                     <q-input v-model="selectedBook.totalQuantity" label="Estoque" type="number" min="1" required borderless  class="InP"/>
                     <q-input v-model="selectedBook.launchDate" label="Data de Lançamento" type="date" required borderless class="InP"/>
-                    <q-select v-model="selectedBook.publisherId" :options="publishers.map(p => ({ label: p.name, value: Number(p.id) }))" label="Editora" class="InP" borderless required/>
+                    <q-select
+                    v-model="selectedBook.publisherId"
+                    :options="publishers"
+                    option-label="name"
+                    option-value="id"
+                    emit-value
+                    map-options
+                    label="Editora"
+                    class="InP"
+                    borderless
+                    required/>
                   </div>
                 </div>
                 <q-btn label="Editar" class="CadastroButtom" @click="EditarBook"/>
@@ -126,7 +146,7 @@
 </template>
 
 <script>
-import { ref, onMounted  } from 'vue';
+import { ref, onMounted, watch  } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
 import { api } from 'src/boot/axios';
 
@@ -137,6 +157,7 @@ export default {
     const AbrirModalView = ref(false);
     const AbrirModalEdit = ref(false);
     const AbrirDeleteModal = ref(false);
+    const BPesquisarBook = ref('');
 
     // Funções para abrir modais
     const openModalNew = () => {
@@ -181,7 +202,7 @@ export default {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/book`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC' },
+          params: { size: 1000, sort: 'id', direction: 'ASC',search:BPesquisarBook.value},
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -199,6 +220,10 @@ export default {
         // Chame `BuscarUser` ao montar
         onMounted(() => {
           PagesBook();
+        });
+
+        watch(BPesquisarBook, () => {
+          PagesBook(); // Recarrega a pesquisa sempre que o termo for alterado
         });
 
     const CadBook = async () => {
@@ -328,7 +353,11 @@ export default {
       const BuscarEditoras = async () => {
         try {
           const token = localStorage.getItem('token');
+
+          console.log(publishers.value)
+
           const response = await api.get(`/publisher`, {
+          params: { size: 1000 },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -379,7 +408,8 @@ export default {
       DadosBook,
       deletarBook,
       publishers,
-      BuscarEditoras
+      BuscarEditoras,
+      BPesquisarBook
     };
   }
 };

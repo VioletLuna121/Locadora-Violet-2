@@ -5,7 +5,22 @@
         <div class="TCima">
           <div style="flex-direction: row; display: flex; gap: 10px">
             <NovoButton @click="openModalNew" class="NButtom"/>
-            <q-select class="filtro" borderless/>
+            <q-select
+              class="filtro"
+              v-model="statusFilter"
+              :options="statusOptions"
+              label="status"
+              clearable
+              emit-value
+              map-options
+              @blur="isFocused = false"
+              @input="PagesRent"
+
+            >
+              <template v-slot:label>
+                <span v-if="!isFocused && !statusFilter">status</span>
+              </template>
+            </q-select>
           </div>
           <BarraPesquisa class="BPesquisa"  v-model="BPesquisarRent" @input="PagesRent"/>
         </div>
@@ -93,6 +108,7 @@ export default {
     const AbrirDevolucaoModal = ref(false);
     const selectedRentId = ref(null);
     const BPesquisarRent = ref('');
+    const statusFilter = ref('');
 
     // Funções para abrir modais
     const openModalNew = () => {
@@ -124,7 +140,7 @@ export default {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/rent`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC', search:BPesquisarRent.value },
+          params: { size: 1000, sort: 'id', direction: 'ASC', search:BPesquisarRent.value, status: statusFilter.value || undefined },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -144,7 +160,7 @@ export default {
           PagesRent();
         });
 
-        watch(BPesquisarRent, () => {
+        watch([BPesquisarRent, statusFilter], () => {
           PagesRent(); // Recarrega a pesquisa sempre que o termo for alterado
         });
 
@@ -254,6 +270,14 @@ export default {
       BuscarLivro();
     });
 
+    // Opções para o filtro de status
+    const statusOptions = ref([
+      { label: 'NO TEMPO', value: 'IN_TIME' },
+      { label: 'DEVOLVIDO COM DELAY', value: 'DELIVERED_WITH_DELAY	' },
+      { label: 'ENTREGUE', value: 'DELIVERED' },
+      { label: 'ATRASADA', value: 'DELAYED' },
+    ]);
+
       const newUser = ref({
         renterId: null,
         bookId: null,
@@ -279,7 +303,9 @@ export default {
       renter,
       BuscarLivro,
       book,
-      BPesquisarRent
+      BPesquisarRent,
+      statusOptions,
+      statusFilter
     };
   }
 };
@@ -416,8 +442,40 @@ export default {
 .filtro{
   border: 1px solid black;
   border-radius: 15px;
-  width: 120px;
   height: 39px;
+  padding-left: 10px;
+  font-size: 14px;
+  width: auto;
+  min-width: 100px;
+
 }
+.filtro .q-field__native {
+  display: flex;
+  align-items: flex-start; /* Alinha o texto ao topo */
+  padding-top: 10px; /* Adiciona espaçamento superior para ajustar */
+  font-size: 14px; /* Certifique-se de ajustar o tamanho da fonte se necessário */
+  height: auto; /* Permite altura flexível para o campo */
+  transform: translateY(-15px); /* Ajusta a posição */
+}
+
+.filtro .q-field__append {
+  display: flex;
+  align-items: flex-start; /* Alinha o ícone ao topo */
+  margin-top: 10px; /* Ajusta o espaçamento superior */
+}
+
+.filtro .q-icon {
+  font-size: 18px; /* Ajuste o tamanho do ícone, se necessário */
+  padding: 0; /* Remove o espaçamento interno */
+}
+
+.filtro .q-field__label {
+  font-size: 14px; /* Tamanho da fonte */
+  color: black;    /* Cor do label */
+  transform: translateY(-10px); /* Ajusta a posição */
+}
+
+
+
 
 </style>

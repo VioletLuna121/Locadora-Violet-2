@@ -60,7 +60,8 @@
         </div>
 
         <div class="Conteudo">
-          <TabelaGeral :rows="tableData" :columns="tableColumns" :rows-per-page="6" class="TGeral"/>
+          <TabelaGeral :rows="tableData" :columns="tableColumns" :rows-per-page="5" class="TGeral"/>
+          <TabelaGeral :rows="tableDataBest" :columns="tableColumnsBest" :rows-per-page="5" class="TGeral2"/>
           <GraficoBarras class="Grafico"/>
         </div>
 
@@ -70,33 +71,90 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { api } from 'src/boot/axios';
 
 export default {
   // name: 'PageName',
   setup(){
 
     const tableColumns = ref([
-      { name: 'user', label: 'Usuário', align: 'center', field: row => row.user },
-      { name: 'rent', label: 'Alugueis', align: 'center', field: row => row.rent },
-      { name: 'loan', label: 'Empréstimos', align: 'center', field: row => row.loan },
-      { name: 'best', label: 'Top 6 livros mais alugados', align: 'center', field: row => row.best }
+      { name: 'name', label: 'Usuário', align: 'center', field: row => row.name },
+      { name: 'totalRents', label: 'Alugueis Realizados', align: 'center', field: row => row.totalRents },
+      { name: 'activeRents', label: 'Alugueis Ativos', align: 'center', field: row => row.activeRents },
+
     ]);
 
-    const tableData = ref([
-      { id: 1, user: 'Brinakkjj	', rent: '1', loan: '0', best: 'joao123', },
-      { id: 2, user: 'Guistico', rent: '1', loan: '1', best: 'maria123' },
-      { id: 3, user: 'Julinha', rent: '2', loan: '0', best: 'maria123' },
-      { id: 4, user: 'Carmila', rent: '1', loan: '0', best: 'maria123' },
-      { id: 5, user: 'Mariana123', rent: '1', loan: '1', best: 'maria123' },
-      { id: 6, user: 'Mariana123', rent: '1', loan: '1', best: 'maria123' },
-      { id: 7, user: 'Mariana123', rent: '1', loan: '1', best: 'maria123' },
-      { id: 8, user: 'Mariana123', rent: '1', loan: '1', best: 'maria123' },
+    const tableData = ref([]);
+
+    const tableUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/rent/renters`, {
+          params: { size: 1000, sort: 'id', direction: 'ASC', },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Verifique se há dados na resposta
+        if (response.data && response.data.content) {
+          tableData.value = response.data.content; // Atualiza os dados da tabela
+        } else {
+          console.warn('Nenhum dado foi retornado da API.');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar Alugueis:', error.response?.data || error.message);
+      }
+    };
+
+        // Chame `BuscarUser` ao montar
+        onMounted(() => {
+          tableUser();
+        });
+
+    const tableColumnsBest = ref([
+      { name: 'rentedNumber', label: 'Ranked', align: 'center', field: row => row.rentedNumber },
+      { name: 'bookName', label: 'Livro', align: 'center', field: row => row.bookName },
     ]);
+
+    const tableDataBest = ref([]);
+
+    const BestBooks = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const books = [];
+
+    // Faz 5 requisições para obter os 5 livros mais alugados
+    for (let i = 0; i <= 4; i++) {
+      const response = await api.get(`/rent/most-rented/${i}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data) {
+        books.push({
+          rentedNumber: i + 1, // O rank atual
+          bookName: response.data.bookName, // Nome do livro retornado pela API
+        });
+      }
+    }
+
+    tableDataBest.value = books; // Atualiza os dados da tabela de livros mais alugados
+  } catch (error) {
+    console.error('Erro ao buscar livros mais alugados:', error.response?.data || error.message);
+  }
+};
+
+    onMounted(() => {
+      BestBooks();
+    });
+
+
 
     return{
       tableColumns,
-      tableData
+      tableData,
+      tableColumnsBest,
+      tableDataBest,
+      tableUser
     }
 
   }
@@ -163,8 +221,15 @@ export default {
 
 .Conteudo .TGeral{
   height: 390px;
-  width: 50%;
+  width: 30%;
   margin-left: 20px;
+  margin-top: 20px;
+  overflow-x: hidden;
+}
+
+.Conteudo .TGeral2{
+  height: 390px;
+  width: 20%;
   margin-top: 20px;
   margin-right: 20px;
   overflow-x: hidden;

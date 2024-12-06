@@ -25,7 +25,7 @@
 
             <q-card-actions align="center" class="column">
               <q-btn label="Entrar" class="Login" @click="LoginButtom"/>
-              <q-btn  label="Esqueceu a Senha?" flat style="position: relative; bottom: 10px;" @click="EsqueceuSenha"/>
+              <q-btn  label="Esqueceu a Senha?" flat style="position: relative; bottom: 10px;" @click="RecSenha"/>
             </q-card-actions>
           </q-card>
       </q-page>
@@ -70,6 +70,10 @@ setup(){
       }
     };
 
+    const  RecSenha = async () => {
+      router.push('/RecSenha');
+    }
+
 
   return{
     password,
@@ -78,28 +82,20 @@ setup(){
     username,
     router,
     LoginButtom,
+    RecSenha
   }
 }
 }
 
 </script>
 
-<style lang="scss">
+<style >
   .C-PrinIndex{
     width: 30%;
     height: 390px;
     background-color: #ffffff;
     border-radius: 15px;
     border: solid 2px rgba(0, 0, 0, 0.699);
-  }
-  .C-PrinIndex .Card-Section-One{
-    background-color: $secondary;
-    text-align: center;
-    height: 60px;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    border: solid 3px black;
   }
 
   .C-PrinIndex .Card-Section-Two{
@@ -140,7 +136,7 @@ setup(){
     bottom: 10px;
   }
 
-  .Loginlogo{
+ .Loginlogo{
     position: absolute;
     top: -5px;
     left: 5px;

@@ -7,7 +7,7 @@
           <q-card class="box">
               <div class="content">
                 <div>
-                  <div class="number">12</div>
+                  <div class="number">{{ Atrasados }}</div>
                   <div class="textBox">Atrasados</div>
                 </div>
                 <div class="icon">
@@ -16,15 +16,15 @@
               </div>
           </q-card>
 
-            <!-- Retângulo de Empréstimos -->
+            <!-- Retângulo de ALugados -->
           <q-card class="box">
             <div class="content">
               <div>
-                <div class="number">35</div>
-                <div class="textBox">Empréstimos</div>
+                <div class="number">{{ Alugados }}</div>
+                <div class="textBox">Alugados</div>
               </div>
               <div class="icon">
-                <q-icon name="library_books" size="44px" style="color: #b3eef1;"></q-icon> <!-- Ícone de Empréstimos -->
+                <q-icon name="book" size="44px" style="color: #b3eef1;"></q-icon> <!-- Ícone de Empréstimos -->
               </div>
 
             </div>
@@ -34,7 +34,7 @@
             <q-card class="box">
             <div class="content">
               <div>
-                <div class="number">23</div>
+                <div class="number">{{ Devolvidos }}</div>
                 <div class="textBox">Devolvidos</div>
               </div>
               <div class="icon">
@@ -44,15 +44,15 @@
             </div>
           </q-card>
 
-                <!-- Retângulo de Livros -->
+                <!-- Retângulo de Estoque -->
                 <q-card class="box">
             <div class="content">
               <div>
-                <div class="number">150</div>
-                <div class="textBox">Devolvidos</div>
+                <div class="number">{{ Livros }}</div>
+                <div class="textBox">Livros</div>
               </div>
               <div class="icon">
-                <q-icon name="book" size="44px" style="color: #b3eef1;"></q-icon> <!-- Ícone de Livros -->
+                <q-icon name="library_books" size="44px" style="color: #b3eef1;"></q-icon>
               </div>
 
             </div>
@@ -78,14 +78,72 @@ export default {
   // name: 'PageName',
   setup(){
 
+    const Atrasados = ref(0);
+    const Devolvidos = ref(0);
+    const Alugados = ref(0);
+    const Livros = ref(0);
+
     const tableColumns = ref([
       { name: 'name', label: 'Usuário', align: 'center', field: row => row.name },
       { name: 'totalRents', label: 'Alugueis Realizados', align: 'center', field: row => row.totalRents },
       { name: 'activeRents', label: 'Alugueis Ativos', align: 'center', field: row => row.activeRents },
-
     ]);
 
     const tableData = ref([]);
+
+    const BuscarLivros = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get('/book', {
+          params: {
+            size: 1000, // Quantidade máxima de livros retornados
+            sort: 'id',
+            direction: 'ASC',
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data) {
+          const { content } = response.data;
+          Livros.value = content.length; // Total de livros cadastrados
+
+        }
+      } catch (error) {
+        console.error('Erro ao buscar livros:', error.response?.data || error.message);
+      }
+    };
+
+    // Função para buscar os dados do endpoint de aluguéis
+    const BuscarAlugueis = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get('/rent', {
+          params: {
+            size: 1000, // Pega até 1000 registros (ajuste se necessário)
+            sort: 'id',
+            direction: 'ASC',
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data) {
+          const { content } = response.data;
+
+          // Contabilizar apenas os atrasados e devolvidos
+          Atrasados.value = content.filter(rent => rent.status === 'DELAYED').length;
+          Devolvidos.value = content.filter(rent => rent.status === 'DELIVERED').length;
+          Alugados.value = content.length; // Contabiliza o número de aluguéis ativos
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados dos aluguéis:', error.response?.data || error.message);
+      }
+    };
+
+    // Chamado ao montar o componente
+    onMounted(() => {
+      BuscarAlugueis();
+      BuscarLivros();
+    });
 
     const tableUser = async () => {
       try {
@@ -154,7 +212,11 @@ export default {
       tableData,
       tableColumnsBest,
       tableDataBest,
-      tableUser
+      tableUser,
+      Atrasados,
+      Devolvidos,
+      Alugados,
+      Livros
     }
 
   }

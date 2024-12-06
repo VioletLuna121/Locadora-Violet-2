@@ -22,12 +22,12 @@ export default defineComponent({
         labels: ['Junho', 'Julho', 'Agosto', 'Setembro' ,'Outubro','Novembro','Dezembro'],
         datasets: [
           {
-            label: 'Empréstimos',
+            label: 'Aluguéis',
             backgroundColor: '#b3eef1',
             data: [0, 3, 4, 10,14,9,8]
           },
           {
-            label: 'Aluguéis',
+            label: '',
             backgroundColor: '#ffd8b0',
             data: [10, 18, 22, 17,8,16,2]
           }

@@ -196,6 +196,8 @@ export default {
       } catch (error) {
         console.error('Erro ao cadastrar usuário:', error.response?.data || error.message);
       }
+
+  
     };
 
     // Novo estado para armazenar os detalhes do usuário

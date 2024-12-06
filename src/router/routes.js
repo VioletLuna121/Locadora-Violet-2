@@ -1,6 +1,6 @@
 const routes = [
   {
-    path: '/',
+    path: '/Main',
     component: () => import('layouts/MainLayout.vue'),
     children: [
     {
@@ -41,12 +41,16 @@ const routes = [
     ]
   },
   {
-    path: '',
+    path: '/',
     component: () => import('src/pages/IndexLoginPage.vue')
   },
   {
     path: '/RecSenha',
     component: () => import('src/pages/RecSenhaVue.vue')
+  },
+  {
+    path: '/MudarSenha',
+    component: () => import('src/pages/MudarSenhaVue.vue')
   },
 
   // Always leave this as last one,

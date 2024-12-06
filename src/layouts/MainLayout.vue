@@ -32,7 +32,7 @@
         >
           <q-list>
             <router-link to="/DashBoard" class="LogoImg">
-              <img :src="logo" class="logo" />
+              <img :src="logo" class="Blogo" />
             </router-link>
             <router-link
               v-for="link in linksList"
@@ -51,6 +51,8 @@
 
             </q-item>
           </router-link>
+
+            <q-icon name="logout" size="44px" style="color: #333333;"></q-icon>
         </q-list>
       </q-drawer>
 
@@ -123,7 +125,7 @@ const isDashboardPage = computed(() => route.path === '/DashBoard')
     width: 200px;
     border-right:1px solid rgba(0, 0, 0, 0.459) ;
   }
-  .LogoImg .logo{
+  .BLateral .Blogo{
     width: 110px;
     margin-left: 80px;
     margin-top: 15px;

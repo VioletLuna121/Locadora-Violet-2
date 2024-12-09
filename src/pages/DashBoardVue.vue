@@ -291,7 +291,7 @@ export default {
 
 .Conteudo .TGeral2{
   height: 390px;
-  width: 20%;
+  width: 22%;
   margin-top: 20px;
   margin-right: 20px;
   overflow-x: hidden;

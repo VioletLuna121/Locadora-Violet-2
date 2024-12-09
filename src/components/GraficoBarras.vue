@@ -1,54 +1,108 @@
 <template>
   <div>
-    <BarChart :data="data" :options="options"/>
+    <DoughnutChart :data="data" :options="options" />
   </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { Chart as ChartJS, BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js';
-import { Bar } from 'vue-chartjs';
+import { defineComponent } from "vue";
+import {
+  Chart as ChartJS,
+  DoughnutController,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Doughnut } from "vue-chartjs";
+import { api } from "src/boot/axios";
 
-ChartJS.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
+ChartJS.register(DoughnutController, ArcElement, Tooltip, Legend);
 
 export default defineComponent({
-  name: 'GraficoBarra',
+  name: "GraficoRosca",
   components: {
-    BarChart: Bar
+    DoughnutChart: Doughnut,
   },
   data() {
     return {
       data: {
-        labels: ['Junho', 'Julho', 'Agosto', 'Setembro' ,'Outubro','Novembro','Dezembro'],
+        labels: ["Alugados", "Devolvidos com Delay", "Devolvidos", "Atrasados"],
         datasets: [
           {
-            label: 'Aluguéis',
-            backgroundColor: '#b3eef1',
-            data: [0, 3, 4, 10,14,9,8]
+            label: "Status dos Aluguéis",
+            backgroundColor: ["#4caf50", "#ff9800", "#2196f3", "#f44336"],
+            data: [0, 0, 0, 0], // Inicializa os dados com valores 0
           },
-          {
-            label: '',
-            backgroundColor: '#ffd8b0',
-            data: [10, 18, 22, 17,8,16,2]
-          }
-        ]
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        },
         plugins: {
           legend: {
-            position: 'top'
+            position: "top",
           },
-        }
-      }
+        },
+      },
     };
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    async fetchData() {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await api.get("/rent", {
+      params: { size: 1000 },
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.data) {
+      const { content } = response.data;
+
+      // Processar os dados para contar os status
+      const statusCounts = this.processData(content);
+
+      // Atualizar os dados do gráfico com uma nova instância
+      this.data = {
+        ...this.data, // Mantém as configurações existentes
+        datasets: [
+          {
+            ...this.data.datasets[0], // Mantém as configurações do dataset
+            data: [
+              statusCounts["IN_TIME"] || 0,
+              statusCounts["DELIVERED_WITH_DELAY"] || 0,
+              statusCounts["DELIVERED"] || 0,
+              statusCounts["DELAYED"] || 0,
+            ],
+          },
+        ],
+      };
+
+      console.log("Dados do gráfico atualizados:", this.data.datasets[0].data);
+    }
+  } catch (error) {
+    console.error("Erro ao buscar dados:", error.response?.data || error.message);
   }
+},
+    processData(items) {
+      return items.reduce(
+        (counts, item) => {
+          if (counts[item.status] !== undefined) {
+            counts[item.status] += 1;
+          }
+          return counts;
+        },
+        {
+          IN_TIME: 0,
+          DELIVERED_WITH_DELAY: 0,
+          DELIVERED: 0,
+          DELAYED: 0,
+        }
+      );
+    },
+  },
 });
 </script>
 

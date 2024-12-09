@@ -3,10 +3,10 @@
     <q-page-container>
       <q-page class="PPage">
         <div class="TCima">
-          <NovoButton @click="openModalNew" class="NButtom"/>
+          <NovoButton @click="openModalNew" class="NButtom"  v-if="!isVisitor"/>
           <BarraPesquisa class="BPesquisa"  v-model="BPesquisarRenters" @input="PagesRenters"/>
         </div>
-        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
+        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}" :user-type="'VISITOR'"/>
 
         <!-- Modal para Novo Locatário -->
         <q-dialog v-model="JModalNew" class="JmodalRenter Sombra" persistent>
@@ -160,6 +160,9 @@ export default {
       selectedRenters.value = row;
       AbrirDeleteModal.value = true;
     };
+
+    const userType = ref(localStorage.getItem('userType') || 'VISITOR'); // Obtém o tipo de usuário
+    const isVisitor = ref(userType.value === 'VISITOR'); // Verifica se é visitante
 
     // Dados para a tabela
     const tableColumns = ref([
@@ -346,7 +349,8 @@ export default {
       DadosRenters,
       EditarRenters,
       deletarRenters,
-      BPesquisarRenters
+      BPesquisarRenters,
+      isVisitor
     };
   }
 };

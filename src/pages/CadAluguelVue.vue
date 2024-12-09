@@ -4,7 +4,7 @@
       <q-page class="PPage">
         <div class="TCima">
           <div style="flex-direction: row; display: flex; gap: 10px">
-            <NovoButton @click="openModalNew" class="NButtom"/>
+            <NovoButton @click="openModalNew" class="NButtom"  v-if="!isVisitor"/>
             <q-select
               class="filtro"
               v-model="statusFilter"
@@ -24,7 +24,7 @@
           </div>
           <BarraPesquisa class="BPesquisa"  v-model="BPesquisarRent" @input="PagesRent"/>
         </div>
-        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{ return:returnItem}"/>
+        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{ return:returnItem}" />
 
         <!-- Modal para Nova Aluguel -->
         <q-dialog v-model="JModalNew" class="JmodalRent Sombra" persistent>
@@ -121,7 +121,11 @@ export default {
       console.log('Deletando:', row);
       selectedRentId.value = row.id;
       AbrirDevolucaoModal.value = true;
+      if (isVisitor.value) return; // Bloqueia a ação caso seja VISITOR
     };
+
+    const userType = ref(localStorage.getItem('userType') || 'VISITOR'); // Obtém o tipo de usuário
+    const isVisitor = ref(userType.value === 'VISITOR'); // Verifica se é visitante
 
     // Dados para a tabela
     const tableColumns = ref([
@@ -130,7 +134,8 @@ export default {
       { name: 'status', label: 'status', align: 'center', field: row => row.status },
       { name: 'deadLineDate', label: 'Data Limite', align: 'center', field: row => row.deadLineDate },
       { name: 'rentDate', label: 'Data do Aluguel', align: 'center', field: row => row.rentDate },
-      { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
+      // Exibe a coluna de ações apenas se não for VISITOR
+      ...(isVisitor.value? []: [{ name: 'action', label: 'Ações', align: 'center', field: row => row.action }]),
     ]);
 
     const tableData = ref([]);
@@ -305,7 +310,8 @@ export default {
       book,
       BPesquisarRent,
       statusOptions,
-      statusFilter
+      statusFilter,
+      isVisitor
     };
   }
 };

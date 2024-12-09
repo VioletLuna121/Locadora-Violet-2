@@ -3,10 +3,10 @@
     <q-page-container>
       <q-page class="PPage">
         <div class="TCima">
-          <NovoButton @click="openModalNew" class="NButtom"/>
-          <BarraPesquisa class="BPesquisa"  v-model="BPesquisarUser" @input="BuscarUser"/>
+          <NovoButton @click="openModalNew" class="NButtom"  v-if="!isVisitor"/>
+          <BarraPesquisa class="BPesquisa"  v-model="BPesquisarUser" @input="PageUser"/>
         </div>
-        <TabelaGeral :rows="tableData" :columns="tableColumns"  class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
+        <TabelaGeral :rows="tableData" :columns="tableColumns"  class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}" :user-type="'VISITOR'"/>
 
         <!-- Modal para Novo Usuário -->
         <q-dialog v-model="JModalNew" class="JmodalUser Sombra" persistent>
@@ -102,6 +102,10 @@
             </q-card-section>
           </q-card>
         </q-dialog>
+        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
+        </q-card-section>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -128,6 +132,9 @@ export default {
       role: 'VISITOR',
     });
 
+    const userType = ref(localStorage.getItem('userType') || 'VISITOR'); // Obtém o tipo de usuário
+    const isVisitor = ref(userType.value === 'VISITOR'); // Verifica se é visitante
+
     const tableData = ref([]);
     const tableColumns = ref([
       { name: 'id', label: 'ID', align: 'center', field: row => row.id },
@@ -136,13 +143,14 @@ export default {
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
+    const currentPage = ref(0);
 
     // Função para buscar todos os usuários de uma vez
-    const BuscarUser = async () => {
+    const PageUser = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/users`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC',search: BPesquisarUser.value, },
+          params: { size: 7,  page: currentPage.value, sort: 'id', direction: 'ASC',search: BPesquisarUser.value, },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -157,13 +165,13 @@ export default {
       }
     };
 
-        // Chame `BuscarUser` ao montar
+        // Chame `PageUser` ao montar
       onMounted(() => {
-        BuscarUser();
+        PageUser();
       });
 
       watch(BPesquisarUser, () => {
-        BuscarUser(); // Recarrega a pesquisa sempre que o termo for alterado
+        PageUser(); // Recarrega a pesquisa sempre que o termo for alterado
       });
 
     // Cadastro de novo usuário
@@ -197,7 +205,7 @@ export default {
         console.error('Erro ao cadastrar usuário:', error.response?.data || error.message);
       }
 
-  
+
     };
 
     // Novo estado para armazenar os detalhes do usuário
@@ -244,7 +252,7 @@ export default {
           if (response.status === 204) {
             console.log('Usuário atualizado com sucesso.');
             AbrirModalEdit.value = false; // Fecha o modal de edição
-            await BuscarUser(); // Atualiza a lista de usuários
+            await PageUser(); // Atualiza a lista de usuários
           } else {
             console.warn('A API retornou um status inesperado:', response.status);
           }
@@ -272,7 +280,7 @@ export default {
           if (response.status === 204) {
             console.log('Usuário excluído com sucesso.');
             AbrirDeleteModal.value = false; // Fecha o modal de exclusão
-            await BuscarUser(); // Atualiza a lista de usuários
+            await PageUser(); // Atualiza a lista de usuários
           } else {
             console.warn(`A API retornou um status inesperado: ${response.status}`);
           }
@@ -304,6 +312,18 @@ export default {
 
     const selectedUser = ref(null);
 
+    const nextPage = () => {
+      currentPage.value++;
+      PageUser();
+    };
+
+    const backPage = () => {
+      if (currentPage.value > 0) {
+        currentPage.value--;
+        PageUser();
+      }
+    };
+
     return {
       JModalNew,
       AbrirModalView,
@@ -319,12 +339,15 @@ export default {
       newUser,
       ConfirmDeleteImg,
       CadNovoUser,
-      BuscarUser,
+      PageUser,
       deletarUser,
       DadosUser,
       BuscarDadosUser,
       EditarUser,
-      BPesquisarUser
+      BPesquisarUser,
+      isVisitor,
+      backPage,
+      nextPage
 
     };
   }
@@ -470,6 +493,22 @@ export default {
 
 .padding_zero{
   padding: 0px;
+}
+
+.Paginacao{
+  color: #333333;
+  border: solid 1px rgba(0, 0, 0, 0.795);
+  height: 40px;
+  width: 50px;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.479);
+
+}
+
+.icon-larger .q-icon {
+  font-size: 40px; /* Ajuste o tamanho do ícone */
+  display: flex;
+  position: relative;
+  bottom: 5px;
 }
 
 </style>

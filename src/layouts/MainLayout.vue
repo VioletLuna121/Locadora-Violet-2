@@ -51,8 +51,11 @@
 
             </q-item>
           </router-link>
-
-            <q-icon name="logout" size="44px" style="color: #333333;"></q-icon>
+          <q-item-section style="color: #333333; display: flex; justify-content: center; align-items: center; margin-top: 60%;">
+            <router-link to="/" style="">
+              <q-btn flat icon="logout" size="30px" @click="logout" aria-label="Sair" style="color: #333333;"></q-btn>
+            </router-link>
+          </q-item-section>
         </q-list>
       </q-drawer>
 
@@ -66,6 +69,12 @@
 import { ref, computed } from 'vue'
 import logo from '../assets/logo_escura.png';
 import { useRoute } from 'vue-router'
+
+function logout() {
+  localStorage.removeItem("token"); // Remova o token de autenticação
+  sessionStorage.removeItem("token"); // Caso o token esteja no sessionStorage
+  window.location.href = "/"; // Redirecione para a página inicial ou de login
+}
 
 defineOptions({
   logo,

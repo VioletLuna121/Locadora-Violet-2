@@ -3,10 +3,10 @@
     <q-page-container>
       <q-page class="PPage">
         <div class="TCima">
-          <NovoButton @click="openModalNew" class="NButtom"/>
+          <NovoButton @click="openModalNew" class="NButtom"  v-if="!isVisitor"/>
           <BarraPesquisa class="BPesquisa"  v-model="BPesquisarPublisher" @input="PagesPublisher"/>
         </div>
-        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
+        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}" :user-type="'VISITOR'"/>
 
         <!-- Modal para Nova Editora -->
         <q-dialog v-model="JModalNew" class="JmodalPublisher Sombra" persistent>
@@ -135,6 +135,9 @@ export default {
       selectedPublisher.value = row;
       AbrirDeleteModal.value = true;
     };
+
+    const userType = ref(localStorage.getItem('userType') || 'VISITOR'); // Obtém o tipo de usuário
+    const isVisitor = ref(userType.value === 'VISITOR'); // Verifica se é visitante
 
     const tableData = ref([]);
 
@@ -321,6 +324,7 @@ export default {
       EditarPublisher,
       deletarPublisher,
       BPesquisarPublisher,
+      isVisitor,
 
 
 

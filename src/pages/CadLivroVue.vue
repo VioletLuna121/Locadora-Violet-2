@@ -3,10 +3,10 @@
     <q-page-container>
       <q-page class="PPage">
         <div class="TCima">
-          <NovoButton @click="openModalNew" class="NButtom"/>
+          <NovoButton @click="openModalNew" class="NButtom"  v-if="!isVisitor"/>
           <BarraPesquisa class="BPesquisa"  v-model="BPesquisarBook" @input="PagesBook"/>
         </div>
-        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}"/>
+        <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}" :user-type="'VISITOR'" />
 
         <!-- Modal para Novo Livro -->
         <q-dialog v-model="JModalNew" class="JmodalBook Sombra" persistent>
@@ -22,15 +22,15 @@
               <q-form>
                 <div class="form">
                   <div>
-                    <q-input v-model="newUser.name" label="Nome" required borderless  class="InP"/>
-                    <q-input v-model="newUser.author" label="Autor" required borderless  class="InP"/>
-                    <q-input v-model="newUser.totalQuantity" label="Quantidade" type="number" min="1" required borderless  class="InP"/>
+                    <q-input v-model="newBook.name" label="Nome" required borderless  class="InP"/>
+                    <q-input v-model="newBook.author" label="Autor" required borderless  class="InP"/>
+                    <q-input v-model="newBook.totalQuantity" label="Quantidade" type="number" min="1" required borderless  class="InP"/>
                   </div>
 
                   <div>
-                    <q-input v-model="newUser.launchDate" label="Data de Lançamento" type="date" required borderless  class="InP"/>
+                    <q-input v-model="newBook.launchDate" label="Data de Lançamento" type="date" required borderless  class="InP"/>
                     <q-select
-                    v-model="newUser.publisherId"
+                    v-model="newBook.publisherId"
                     :options="publishers"
                     option-label="name"
                     option-value="id"
@@ -140,7 +140,12 @@
             </q-card-section>
           </q-card>
         </q-dialog>
+        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
+         </q-card-section>
       </q-page>
+
     </q-page-container>
   </q-layout>
 </template>
@@ -184,6 +189,9 @@ export default {
       AbrirDeleteModal.value = true;
     };
 
+    const userType = ref(localStorage.getItem('userType') || 'VISITOR'); // Obtém o tipo de usuário
+    const isVisitor = ref(userType.value === 'VISITOR'); // Verifica se é visitante
+
     // Dados para a tabela
     const tableColumns = ref([
       { name: 'id', label: 'ID', align: 'center', field: row => row.id },
@@ -197,12 +205,14 @@ export default {
 
     const tableData = ref([]);
 
+    const currentPage = ref(0);
+
     // Função para buscar todos as editoras de uma vez
     const PagesBook = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/book`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC',search:BPesquisarBook.value},
+          params: {  size: 7, page: currentPage.value, sort: 'id', direction: 'ASC',search:BPesquisarBook.value},
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -231,20 +241,20 @@ export default {
         const token = localStorage.getItem('token');
 
         console.log("Dados de cadastro do livro:", {
-          name: newUser.value.name,
-          author: newUser.value.author,
-          totalQuantity: newUser.value.totalQuantity,
-          launchDate: newUser.value.launchDate,
-          publisherId: newUser.value.publisherId,
+          name: newBook.value.name,
+          author: newBook.value.author,
+          totalQuantity: newBook.value.totalQuantity,
+          launchDate: newBook.value.launchDate,
+          publisherId: newBook.value.publisherId,
          });
 
         const response = await api.post('/book',{
 
-          name: newUser.value.name,
-          author: newUser.value.author,
-          totalQuantity: newUser.value.totalQuantity,
-          launchDate: newUser.value.launchDate,
-          publisherId: newUser.value.publisherId,
+          name: newBook.value.name,
+          author: newBook.value.author,
+          totalQuantity: newBook.value.totalQuantity,
+          launchDate: newBook.value.launchDate,
+          publisherId: newBook.value.publisherId,
 
         },
         {
@@ -256,7 +266,7 @@ export default {
 
         // Fechar o modal e limpar o formulário
         JModalNew.value = false;
-        newUser.value = {
+        newBook.value = {
           name: '',
           author: '',
           totalQuantity:'',
@@ -377,7 +387,7 @@ export default {
       });
 
     const selectedBook = ref(null);
-    const newUser = ref({
+    const newBook = ref({
       name: '',
       author: '',
       totalQuantity:'',
@@ -385,6 +395,18 @@ export default {
       publisherId:'',
     });
     const password = ref('');
+
+    const nextPage = () => {
+      currentPage.value++;
+      PagesBook();
+    };
+
+    const backPage = () => {
+      if (currentPage.value > 0) {
+        currentPage.value--;
+        PagesBook();
+      }
+    };
 
     return {
       JModalNew,
@@ -398,7 +420,7 @@ export default {
       tableData,
       tableColumns,
       selectedBook,
-      newUser,
+      newBook,
       password,
       ConfirmDeleteImg,
       PagesBook,
@@ -409,7 +431,11 @@ export default {
       deletarBook,
       publishers,
       BuscarEditoras,
-      BPesquisarBook
+      BPesquisarBook,
+      isVisitor,
+      backPage,
+      nextPage
+
     };
   }
 };
@@ -418,6 +444,7 @@ export default {
 <style>
 .PPage {
   margin: 30px 60px 0px 70px;
+  height: 100px;
 }
 
 .TCima {
@@ -542,6 +569,22 @@ export default {
 
 .padding_zero{
   padding: 0px;
+}
+
+.Paginacao{
+  color: #333333;
+  border: solid 1px rgba(0, 0, 0, 0.795);
+  height: 40px;
+  width: 50px;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.479);
+
+}
+
+.icon-larger .q-icon {
+  font-size: 40px; /* Ajuste o tamanho do ícone */
+  display: flex;
+  position: relative;
+  bottom: 5px;
 }
 
 </style>

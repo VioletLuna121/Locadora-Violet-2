@@ -3,7 +3,7 @@
     <q-page-container>
       <q-page class="PPage">
         <div class="TCima">
-          <NovoButton @click="openModalNew" class="NButtom"  v-if="!isVisitor"/>
+          <NovoButton @click="openModalNew" class="NButtom" v-if="user.role === 'ADMIN'"/>
           <BarraPesquisa class="BPesquisa"  v-model="BPesquisarRenters" @input="PagesRenters"/>
         </div>
         <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}" :user-type="'VISITOR'"/>
@@ -119,6 +119,10 @@
             </q-card-section>
           </q-card>
         </q-dialog>
+        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
+        </q-card-section>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -128,6 +132,7 @@
 import { ref, onMounted, watch } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
 import { api } from '/src/boot/axios';
+import { Notify } from 'quasar';
 
 export default {
   setup() {
@@ -161,8 +166,18 @@ export default {
       AbrirDeleteModal.value = true;
     };
 
-    const userType = ref(localStorage.getItem('userType') || 'VISITOR'); // Obtém o tipo de usuário
-    const isVisitor = ref(userType.value === 'VISITOR'); // Verifica se é visitante
+    const user = ref({ role: '' });
+
+    // Função para validar o papel do usuário
+    const userValid = () => {
+    const role = localStorage.getItem('role');
+    if (role) {
+      user.value.role = role;
+    } else {
+      console.warn("Função não encontrada em localStorage. Definindo como 'VISITOR' por padrão");
+      user.value.role = 'ADMIN'; // Define como 'VISITOR' se não existir
+    }
+    };
 
     // Dados para a tabela
     const tableColumns = ref([
@@ -175,12 +190,14 @@ export default {
 
     const tableData = ref([]);
 
+    const currentPage = ref(0);
+
      // Função para buscar todos os locatarios de uma vez
      const PagesRenters = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/renter`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC', search:BPesquisarRenters.value },
+          params: { size: 7,page:currentPage.value, sort: 'id', direction: 'ASC', search:BPesquisarRenters.value },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -191,12 +208,21 @@ export default {
           console.warn('Nenhum dado foi retornado da API.');
         }
       } catch (error) {
-        console.error('Erro ao buscar editoras:', error.response?.data || error.message);
-      }
+      // Exibir mensagem de erro
+      const errorMessage =
+        error.response?.data?.message || 'Erro ao carregar Locatários';
+      Notify.create({
+        type: 'negative',
+        message: `${errorMessage}`,
+        position: 'bottom-right',
+        timeout: 1500,
+      });
+    }
     };
 
         onMounted(() => {
           PagesRenters();
+          userValid();
         });
 
         watch(BPesquisarRenters, () => {
@@ -233,9 +259,23 @@ export default {
           address:'',
           cpf:'', };
         }
+        Notify.create({
+            type: 'positive',
+            message: 'Locatário cadastrado com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
         await PagesRenters();
       } catch (error) {
-        console.error('Erro ao cadastrar Locatário:', error.response?.data || error.message);
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Erro ao cadastrar Locatário.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
       }
     };
 
@@ -252,10 +292,25 @@ export default {
         DadosRenters.value = response.data;
         console.log("Dados do Locatário carregados:", DadosRenters.value);
 
+        Notify.create({
+            type: 'positive',
+            message: 'Dados do Locatário',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
+
         AbrirModalView.value = true;
         } catch (error) {
-          console.error('Erro ao buscar detalhes do locatário:', error.response?.data || error.message);
-        }
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Erro ao carregar dados.';
+        Notify.create({
+          type: 'negative',
+          message: `Erro ao carregar usuários: ${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
+      }
       };
 
       const EditarRenters = async () => {
@@ -285,9 +340,24 @@ export default {
             } else {
               console.warn('A API retornou um status inesperado:', response.status);
             }
+
+            Notify.create({
+            type: 'positive',
+            message: 'Locatário editado com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
           } catch (error) {
-            console.error('Erro ao editar locatário:', error.response?.data || error.message);
-          }
+          // Exibir mensagem de erro
+          const errorMessage =
+            error.response?.data?.message || 'Erro ao editar Locatário.';
+          Notify.create({
+            type: 'negative',
+            message: `${errorMessage}`,
+            position: 'bottom-right',
+            timeout: 1500,
+          });
+        }
         };
 
       const deletarRenters = async () => {
@@ -313,9 +383,23 @@ export default {
           } else {
             console.warn(`A API retornou um status inesperado: ${response.status}`);
           }
+          Notify.create({
+            type: 'positive',
+            message: 'Locatário deletada com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
         } catch (error) {
-          console.error('Erro ao excluir locatário:', error.response?.data || error.message);
-        }
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Erro ao deletar Locatário.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
+      }
       };
 
     const selectedRenters = ref(null);
@@ -327,6 +411,18 @@ export default {
       cpf:'',
     });
     const password = ref('');
+
+    const nextPage = () => {
+      currentPage.value++;
+      PagesRenters();
+    };
+
+    const backPage = () => {
+      if (currentPage.value > 0) {
+        currentPage.value--;
+        PagesRenters();
+      }
+    };
 
     return {
       JModalNew,
@@ -350,7 +446,9 @@ export default {
       EditarRenters,
       deletarRenters,
       BPesquisarRenters,
-      isVisitor
+      user,
+      nextPage,
+      backPage
     };
   }
 };
@@ -489,6 +587,22 @@ export default {
 
 .padding_zero{
   padding: 0px;
+}
+
+.Paginacao{
+  color: #333333;
+  border: solid 1px rgba(0, 0, 0, 0.795);
+  height: 40px;
+  width: 50px;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.479);
+
+}
+
+.icon-larger .q-icon {
+  font-size: 40px; /* Ajuste o tamanho do ícone */
+  display: flex;
+  position: relative;
+  bottom: 5px;
 }
 
 </style>

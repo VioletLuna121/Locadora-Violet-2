@@ -3,7 +3,7 @@
     <q-page-container>
       <q-page class="PPage">
         <div class="TCima">
-          <NovoButton @click="openModalNew" class="NButtom"  v-if="!isVisitor"/>
+          <NovoButton @click="openModalNew" class="NButtom" v-if="user.role === 'ADMIN'"/>
           <BarraPesquisa class="BPesquisa"  v-model="BPesquisarBook" @input="PagesBook"/>
         </div>
         <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}" :user-type="'VISITOR'" />
@@ -154,6 +154,7 @@
 import { ref, onMounted, watch  } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
 import { api } from 'src/boot/axios';
+import { Notify } from 'quasar';
 
 export default {
   setup() {
@@ -189,8 +190,18 @@ export default {
       AbrirDeleteModal.value = true;
     };
 
-    const userType = ref(localStorage.getItem('userType') || 'VISITOR'); // Obtém o tipo de usuário
-    const isVisitor = ref(userType.value === 'VISITOR'); // Verifica se é visitante
+    const user = ref({ role: '' });
+
+    // Função para validar o papel do usuário
+    const userValid = () => {
+    const role = localStorage.getItem('role');
+    if (role) {
+      user.value.role = role;
+    } else {
+      console.warn("Função não encontrada em localStorage. Definindo como 'VISITOR' por padrão");
+      user.value.role = 'ADMIN'; // Define como 'VISITOR' se não existir
+    }
+  };
 
     // Dados para a tabela
     const tableColumns = ref([
@@ -223,13 +234,22 @@ export default {
           console.warn('Nenhum dado foi retornado da API.');
         }
       } catch (error) {
-        console.error('Erro ao buscar livros:', error.response?.data || error.message);
-      }
+    // Exibir mensagem de erro
+    const errorMessage =
+      error.response?.data?.message || 'Erro ao carregar Livros.';
+    Notify.create({
+      type: 'negative',
+      message: `${errorMessage}`,
+      position: 'bottom-right',
+      timeout: 1500,
+    });
+  }
     };
 
         // Chame `BuscarUser` ao montar
         onMounted(() => {
           PagesBook();
+          userValid();
         });
 
         watch(BPesquisarBook, () => {
@@ -273,9 +293,24 @@ export default {
           launchDate:'',
           publisherId:'', };
         }
+
+        Notify.create({
+            type: 'positive',
+            message: 'Livro cadastrado com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
         await PagesBook();
       } catch (error) {
-        console.error('Erro ao cadastrar usuário:', error.response?.data || error.message);
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Erro ao cadastrar Livro.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
       }
     };
 
@@ -292,10 +327,25 @@ export default {
     DadosBook.value = response.data;
     console.log("Dados do livro carregados:", DadosBook.value);
 
+    Notify.create({
+      type: 'positive',
+      message: 'Dados do Livro',
+      position: 'bottom-right',
+      timeout: 1500,
+    });
+
     AbrirModalView.value = true;
     } catch (error) {
-      console.error('Erro ao buscar detalhes do livro:', error.response?.data || error.message);
-    }
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Erro ao carregar dados.';
+        Notify.create({
+          type: 'negative',
+          message: `Erro ao carregar usuários: ${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
+      }
   };
 
     const EditarBook = async () => {
@@ -325,9 +375,24 @@ export default {
             } else {
               console.warn('A API retornou um status inesperado:', response.status);
             }
+
+            Notify.create({
+              type: 'positive',
+              message: 'Livro editado com sucesso!',
+              position: 'bottom-right',
+              timeout: 1500,
+            });
           } catch (error) {
-            console.error('Erro ao editar editora:', error.response?.data || error.message);
-          }
+          // Exibir mensagem de erro
+          const errorMessage =
+            error.response?.data?.message || 'Erro ao editar Livro.';
+          Notify.create({
+            type: 'negative',
+            message: `${errorMessage}`,
+            position: 'bottom-right',
+            timeout: 1500,
+          });
+        }
         };
 
         const deletarBook = async () => {
@@ -353,9 +418,24 @@ export default {
           } else {
             console.warn(`A API retornou um status inesperado: ${response.status}`);
           }
+
+          Notify.create({
+            type: 'positive',
+            message: 'Locatário deletada com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
         } catch (error) {
-          console.error('Erro ao excluir livro:', error.response?.data || error.message);
-        }
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Erro ao deletar Livro.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
+      }
       };
 
       const publishers = ref([]);
@@ -432,7 +512,7 @@ export default {
       publishers,
       BuscarEditoras,
       BPesquisarBook,
-      isVisitor,
+      user,
       backPage,
       nextPage
 

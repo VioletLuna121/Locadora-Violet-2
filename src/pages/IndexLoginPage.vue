@@ -38,6 +38,7 @@ import { ref } from 'vue';
 import logo from '../assets/logo_escura.png';
 import { useRouter } from 'vue-router';
 import { api } from 'src/boot/axios';
+import { Notify } from 'quasar';
 
 
 export default {
@@ -49,26 +50,46 @@ setup(){
   const router = useRouter();
 
   const LoginButtom = async () => {
-      try {
-        // Enviando a requisição de login para a API
-        const response = await api.post('/auth/login', {
-          username: username.value,
-          password: password.value,
-        });
+    try {
+      // Enviando a requisição de login para a API
+      const response = await api.post('/auth/login', {
+        username: username.value,
+        password: password.value,
+      });
 
-        if (response.data && response.data.token) {
-          // Salvando o token no localStorage
-          localStorage.setItem('token', response.data.token);
+      if (response.data && response.data.token) {
+        // Salvando o token, username e role no localStorage
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('username', response.data.username);
+        localStorage.setItem('role', response.data.role);
 
-          // Redirecionando para o Dashboard após o login
-          router.push('/DashBoard');
-        } else {
-          console.log('Erro no login:', response);
-        }
-      } catch (error) {
-        console.error('Erro na autenticação:', error);
+         // Notificação de sucesso
+         Notify.create({
+            type: 'positive',
+            message: 'Login realizado com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
+
+        // Redirecionando para o Dashboard após o login
+        router.push('/DashBoard');
+      } else {
+        Notify.create({
+            type: 'negative',
+            message: 'Erro no login. Dados inválidos.',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
       }
-    };
+    } catch (error) {
+      Notify.create({
+          type: 'negative',
+          message: 'Erro ao tentar fazer login. Verifique os dados e tente novamente.',
+          position: 'bottom-right',
+          timeout: 1500,
+        });
+    }
+  };
 
     const  RecSenha = async () => {
       router.push('/RecSenha');

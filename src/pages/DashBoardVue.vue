@@ -73,6 +73,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { api } from 'src/boot/axios';
+import { Notify } from 'quasar';
 
 export default {
   // name: 'PageName',
@@ -109,7 +110,15 @@ export default {
 
         }
       } catch (error) {
-        console.error('Erro ao buscar livros:', error.response?.data || error.message);
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Error ao carregar quantidade de livros.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
       }
     };
 
@@ -135,7 +144,15 @@ export default {
           Alugados.value = content.length; // Contabiliza o número de aluguéis ativos
         }
       } catch (error) {
-        console.error('Erro ao buscar dados dos aluguéis:', error.response?.data || error.message);
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Error ao carregar dados de quantidade dos alugueis.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
       }
     };
 
@@ -145,7 +162,7 @@ export default {
       BuscarLivros();
     });
 
-    const tableUser = async () => {
+    const tableUserRenters = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/rent/renters`, {
@@ -160,13 +177,21 @@ export default {
           console.warn('Nenhum dado foi retornado da API.');
         }
       } catch (error) {
-        console.error('Erro ao buscar Alugueis:', error.response?.data || error.message);
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Error ao carregar tabela de alugueis por usuarios.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
       }
     };
 
         // Chame `BuscarUser` ao montar
         onMounted(() => {
-          tableUser();
+          tableUserRenters();
         });
 
     const tableColumnsBest = ref([
@@ -197,8 +222,16 @@ export default {
 
     tableDataBest.value = books; // Atualiza os dados da tabela de livros mais alugados
   } catch (error) {
-    console.error('Erro ao buscar livros mais alugados:', error.response?.data || error.message);
-  }
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Error ao carregar tabela de livros mais alugados.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
+      }
 };
 
     onMounted(() => {
@@ -212,7 +245,7 @@ export default {
       tableData,
       tableColumnsBest,
       tableDataBest,
-      tableUser,
+      tableUserRenters,
       Atrasados,
       Devolvidos,
       Alugados,

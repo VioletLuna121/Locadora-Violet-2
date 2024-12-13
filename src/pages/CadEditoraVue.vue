@@ -3,7 +3,7 @@
     <q-page-container>
       <q-page class="PPage">
         <div class="TCima">
-          <NovoButton @click="openModalNew" class="NButtom"  v-if="!isVisitor"/>
+          <NovoButton @click="openModalNew" class="NButtom" v-if="user.role === 'ADMIN'"/>
           <BarraPesquisa class="BPesquisa"  v-model="BPesquisarPublisher" @input="PagesPublisher"/>
         </div>
         <TabelaGeral :rows="tableData" :columns="tableColumns" class="TGeral" :action-icons="{view: viewItem, edit: editItem, delete: deleteItem}" :user-type="'VISITOR'"/>
@@ -94,6 +94,10 @@
             </q-card-section>
           </q-card>
         </q-dialog>
+        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
+        </q-card-section>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -103,6 +107,7 @@
 import { ref, onMounted, watch } from 'vue';
 import ConfirmDeleteImg from '../assets/No_Delete.png';
 import { api } from 'src/boot/axios';
+import { Notify } from 'quasar';
 
 export default {
   setup() {
@@ -136,8 +141,18 @@ export default {
       AbrirDeleteModal.value = true;
     };
 
-    const userType = ref(localStorage.getItem('userType') || 'VISITOR'); // Obtém o tipo de usuário
-    const isVisitor = ref(userType.value === 'VISITOR'); // Verifica se é visitante
+    const user = ref({ role: '' });
+
+    // Função para validar o papel do usuário
+    const userValid = () => {
+    const role = localStorage.getItem('role');
+    if (role) {
+      user.value.role = role;
+    } else {
+      console.warn("Função não encontrada em localStorage. Definindo como 'VISITOR' por padrão");
+      user.value.role = 'ADMIN'; // Define como 'VISITOR' se não existir
+    }
+  };
 
     const tableData = ref([]);
 
@@ -151,12 +166,14 @@ export default {
       { name: 'action', label: 'Ações', align: 'center', field: row => row.action },
     ]);
 
+     const currentPage = ref(0);
+
       // Função para buscar todos as editoras de uma vez
       const PagesPublisher = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/publisher`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC', search: BPesquisarPublisher.value },
+          params: { size: 7, page: currentPage.value, sort: 'id', direction: 'ASC', search: BPesquisarPublisher.value },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -167,13 +184,22 @@ export default {
           console.warn('Nenhum dado foi retornado da API.');
         }
       } catch (error) {
-        console.error('Erro ao buscar editoras:', error.response?.data || error.message);
-      }
+    // Exibir mensagem de erro
+    const errorMessage =
+      error.response?.data?.message || 'Erro ao carregar Editoras.';
+    Notify.create({
+      type: 'negative',
+      message: `${errorMessage}`,
+      position: 'bottom-right',
+      timeout: 1500,
+    });
+  }
     };
 
         // Chame `BuscarUser` ao montar
         onMounted(() => {
           PagesPublisher();
+          userValid();
         });
 
         watch(BPesquisarPublisher, () => {
@@ -206,9 +232,23 @@ export default {
           telephone: '',
           site: '' };
         }
+        Notify.create({
+            type: 'positive',
+            message: 'Editora cadastrada com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
       } catch (error) {
-        console.error('Erro ao cadastrar usuário:', error.response?.data || error.message);
-      }
+    // Exibir mensagem de erro
+    const errorMessage =
+      error.response?.data?.message || 'Erro ao cadastrar Editora.';
+    Notify.create({
+      type: 'negative',
+      message: `${errorMessage}`,
+      position: 'bottom-right',
+      timeout: 1500,
+    });
+  }
     };
 
     const DadosPublisher = ref({}); // Inicializado como objeto vazio para evitar problemas de acesso
@@ -224,11 +264,26 @@ export default {
         DadosPublisher.value = response.data; // Armazena os detalhes da editora
         console.log("Dados da editora carregados:", DadosPublisher.value); // Log dos dados carregados
 
+        Notify.create({
+            type: 'positive',
+            message: 'Dados da Editora',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
+
         // Abre o modal de visualização após carregar os dados
         AbrirModalView.value = true;
       } catch (error) {
-        console.error('Erro ao buscar detalhes da editora:', error.response?.data || error.message);
-      }
+    // Exibir mensagem de erro
+    const errorMessage =
+      error.response?.data?.message || 'Erro ao carregar dados.';
+    Notify.create({
+      type: 'negative',
+      message: `Erro ao carregar usuários: ${errorMessage}`,
+      position: 'bottom-right',
+      timeout: 1500,
+    });
+  }
     };
 
     const EditarPublisher = async () => {
@@ -257,9 +312,23 @@ export default {
           } else {
             console.warn('A API retornou um status inesperado:', response.status);
           }
+          Notify.create({
+            type: 'positive',
+            message: 'Editora editada com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
         } catch (error) {
-          console.error('Erro ao editar editora:', error.response?.data || error.message);
-        }
+    // Exibir mensagem de erro
+    const errorMessage =
+      error.response?.data?.message || 'Erro ao editar Editora.';
+    Notify.create({
+      type: 'negative',
+      message: `${errorMessage}`,
+      position: 'bottom-right',
+      timeout: 1500,
+    });
+  }
       };
 
       const deletarPublisher = async () => {
@@ -285,9 +354,23 @@ export default {
           } else {
             console.warn(`A API retornou um status inesperado: ${response.status}`);
           }
+          Notify.create({
+            type: 'positive',
+            message: 'Editora deletada com sucesso!',
+            position: 'bottom-right',
+            timeout: 1500,
+          });
         } catch (error) {
-          console.error('Erro ao excluir usuário:', error.response?.data || error.message);
-        }
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Erro ao deletar Editora.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
+      }
       };
 
 
@@ -301,6 +384,18 @@ export default {
     });
 
     const password = ref('');
+
+    const nextPage = () => {
+      currentPage.value++;
+      PagesPublisher();
+    };
+
+    const backPage = () => {
+      if (currentPage.value > 0) {
+        currentPage.value--;
+        PagesPublisher();
+      }
+    };
 
     return {
       JModalNew,
@@ -324,9 +419,9 @@ export default {
       EditarPublisher,
       deletarPublisher,
       BPesquisarPublisher,
-      isVisitor,
-
-
+      user,
+      nextPage,
+      backPage
 
     };
   }
@@ -465,6 +560,22 @@ export default {
 .marginBottom{
   margin-bottom: 20px;
 
+}
+
+.Paginacao{
+  color: #333333;
+  border: solid 1px rgba(0, 0, 0, 0.795);
+  height: 40px;
+  width: 50px;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.479);
+
+}
+
+.icon-larger .q-icon {
+  font-size: 40px; /* Ajuste o tamanho do ícone */
+  display: flex;
+  position: relative;
+  bottom: 5px;
 }
 
 </style>

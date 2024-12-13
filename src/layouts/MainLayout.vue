@@ -17,7 +17,7 @@
           {{ pageTitle }}
         </q-toolbar-title>
 
-        <div  class="text-black" >Bem vindo(a) <!--{{ $User }}--></div>
+        <div  class="text-black" >Bem vindo(a) {{ username }}</div>
         <q-btn flat icon="account_circle" aria-label="Perfil" class="text-black"/>
 
       </q-toolbar>
@@ -53,7 +53,7 @@
           </router-link>
           <q-item-section style="color: #333333; display: flex; justify-content: center; align-items: center; margin-top: 60%;">
             <router-link to="/" style="">
-              <q-btn flat icon="logout" size="30px" @click="logout" aria-label="Sair" style="color: #333333;"></q-btn>
+              <q-btn flat icon="logout" size="25px" @click="logout" aria-label="Sair" style="color: #333333;"></q-btn>
             </router-link>
           </q-item-section>
         </q-list>
@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed,onMounted } from 'vue'
 import logo from '../assets/logo_escura.png';
 import { useRoute } from 'vue-router'
 
@@ -75,6 +75,12 @@ function logout() {
   sessionStorage.removeItem("token"); // Caso o token esteja no sessionStorage
   window.location.href = "/"; // Redirecione para a página inicial ou de login
 }
+
+const username = ref('');
+
+onMounted(() => {
+  username.value = localStorage.getItem('username') || 'Usuário';
+});
 
 defineOptions({
   logo,

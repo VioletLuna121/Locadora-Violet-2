@@ -83,8 +83,16 @@ export default defineComponent({
       console.log("Dados do gráfico atualizados:", this.data.datasets[0].data);
     }
   } catch (error) {
-    console.error("Erro ao buscar dados:", error.response?.data || error.message);
-  }
+        // Exibir mensagem de erro
+        const errorMessage =
+          error.response?.data?.message || 'Error ao carregar gráficos.';
+        Notify.create({
+          type: 'negative',
+          message: `${errorMessage}`,
+          position: 'bottom-right',
+          timeout: 1500,
+        });
+      }
 },
     processData(items) {
       return items.reduce(

@@ -10,16 +10,16 @@
     <template v-slot:body-cell-action="props">
       <div class="action-icons border-left">
         <q-btn v-if="actionIcons.view" icon="visibility" @click="actionIcons.view(props.row)" flat class="action" />
-        <q-btn v-if="actionIcons.edit && !isVisitor" icon="edit" @click="actionIcons.edit(props.row)" flat class="action" />
-        <q-btn v-if="actionIcons.delete && !isVisitor" icon="delete" @click="actionIcons.delete(props.row)" flat class="action" />
-        <q-btn v-if="actionIcons.return && !isVisitor" icon="beenhere" @click="actionIcons.return(props.row)" flat class="action" />
+        <q-btn v-if="actionIcons.edit && user.role === 'ADMIN'" icon="edit" @click="actionIcons.edit(props.row)" flat class="action" />
+        <q-btn v-if="actionIcons.delete && user.role === 'ADMIN'" icon="delete" @click="actionIcons.delete(props.row)" flat class="action" />
+        <q-btn v-if="actionIcons.return && user.role === 'ADMIN'" icon="beenhere" @click="actionIcons.return(props.row)" flat class="action" />
       </div>
     </template>
   </q-table>
 </template>
 
 <script setup>
-import { defineProps, computed } from 'vue';
+import { defineProps, ref, onMounted } from 'vue';
 
 const props = defineProps({
   rows: {
@@ -40,13 +40,27 @@ const props = defineProps({
     type: Number,
     default: 7, // Valor padrão de 7 linhas, mas pode ser modificado dinamicamente
   },
-  userType: {
-    type: String,
-    required: true,
-  },
 });
 
-const isVisitor = computed(() => props.userType === 'VISITOR');
+// Definindo a reatividade para o usuário
+const user = ref({ role: '' });
+
+// Função para validar o papel do usuário
+const userValid = () => {
+  const role = localStorage.getItem('role');
+  if (role) {
+    user.value.role = role;
+  } else {
+    console.warn("Função não encontrada em localStorage. Definindo como 'VISITOR' por padrão");
+    user.value.role = 'ADMIN'; // Define como 'VISITOR' se não existir
+  }
+};
+
+// Chama a função ao montar o componente
+onMounted(() => {
+  userValid();
+  console.log('User Role from localStorage:', user.value.role); // Log para verificar o papel
+});
 </script>
 
 <style>

@@ -18,10 +18,10 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form>
                 <div class="form">
-                  <div>
+                  <div style="width: 260px;">
                     <q-input v-model="newUser.name" label="Nome" required borderless  class="InP"/>
                     <q-input v-model="newUser.email" label="Email" type="email" required borderless  class="InP"/>
                     <q-input v-model="newUser.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
@@ -48,10 +48,10 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form>
                 <div class="form">
-                  <div>
+                  <div style="width: 260px;">
                     <q-input v-model="DadosRenters.name" label="Nome" disable borderless  class="InP"/>
                     <q-input v-model="DadosRenters.email" label="Email" type="email" disable borderless  class="InP"/>
                     <q-input v-model="DadosRenters.telephone" label="Telefone" type="tel" disable borderless  class="InP"/>
@@ -77,17 +77,16 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form>
                 <div class="form">
-                  <div>
-                    <q-input v-model="selectedRenters.id" label="ID" disable borderless  class="InP"/>
+                  <div style="width: 260px;">
+                    <q-input v-model="selectedRenters.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
                     <q-input v-model="selectedRenters.name" label="Nome" required borderless  class="InP"/>
                     <q-input v-model="selectedRenters.email" label="Email" type="email" required borderless  class="InP"/>
                   </div>
 
                   <div>
-                    <q-input v-model="selectedRenters.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
                     <q-input v-model="selectedRenters.address" label="Endereço" required borderless  class="InP"/>
                     <q-input v-model="selectedRenters.cpf" label="CPF" borderless  class="InP"/>
                   </div>
@@ -119,9 +118,10 @@
             </q-card-section>
           </q-card>
         </q-dialog>
-        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
-          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
-          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
+        <q-card-section  class="PaginacaoContainer q-px-md q-py-sm"
+        style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; ">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage" aria-label="Página anterior"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage" aria-label="Próxima página"></q-btn>
         </q-card-section>
       </q-page>
     </q-page-container>
@@ -487,7 +487,6 @@ export default {
 
 .JmodalRenter .ModalCard {
   background-color: #ffffff;
-  min-width: 50%;
   border: 2px solid black;
   border-radius: 20px;
 }
@@ -512,8 +511,8 @@ export default {
   background-color: white;
   border: solid 2px rgba(0, 0, 0, 0.550);
   padding-left: 10px;
-  width: 250px;
-  height: 55px;
+  width: 240px;
+  height: 50px;
 }
 
 .InputView {

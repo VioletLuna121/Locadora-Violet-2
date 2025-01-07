@@ -3,7 +3,7 @@
     <q-page-container>
       <q-page class="Q-Page" padding >
         <img :src="logo" class="Loginlogo"/>
-          <q-card class="C-PrinIndex" borderless>
+          <q-card class="C-PrinMudar" borderless>
 
             <q-card-section class="q-pa-md" style=" display: flex; justify-content: center; height: 13%; ">
              <div class="text-h4 text-weight-medium" style="display: flex; justify-content: center; color: #333333; ">Mudar Senha</div>

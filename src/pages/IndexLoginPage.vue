@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import logo from '../assets/logo_escura.png';
 import { useRouter } from 'vue-router';
 import { api } from 'src/boot/axios';
@@ -49,6 +49,14 @@ setup(){
   const lembrarMe = ref(false)
   const router = useRouter();
 
+  onMounted(() => {
+      const LembreMeNome = localStorage.getItem('LembreMeNome');
+      if (LembreMeNome) {
+        username.value = LembreMeNome;
+        lembrarMe.value = true; // Checkbox marcado automaticamente
+      }
+    });
+
   const LoginButtom = async () => {
     try {
       // Enviando a requisição de login para a API
@@ -62,6 +70,13 @@ setup(){
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('username', response.data.username);
         localStorage.setItem('role', response.data.role);
+
+           // Armazenar o nome de usuário se "Lembrar-me" estiver marcado
+      if (lembrarMe.value) {
+        localStorage.setItem('LembreMeNome', username.value);
+      } else {
+        localStorage.removeItem('LembreMeNome');
+      }
 
          // Notificação de sucesso
          Notify.create({

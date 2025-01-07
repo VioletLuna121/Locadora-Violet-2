@@ -18,10 +18,10 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form>
                 <div class="form">
-                  <div>
+                  <div style="width: 250px;">
                     <q-input v-model="newBook.name" label="Nome" required borderless  class="InP"/>
                     <q-input v-model="newBook.author" label="Autor" required borderless  class="InP"/>
                     <q-input v-model="newBook.totalQuantity" label="Quantidade" type="number" min="1" required borderless  class="InP"/>
@@ -58,10 +58,10 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form>
                 <div class="form">
-                  <div>
+                  <div style="width: 270px;">
                     <q-input v-model="DadosBook.name" label="Nome" disable borderless  class="InP"/>
                     <q-input v-model="DadosBook.author" label="Autor" disable borderless  class="InP"/>
                     <q-input v-model="DadosBook.availableQuantity" label="Quant. Disponivel" disable borderless  class="InP"/>
@@ -88,17 +88,16 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form>
                 <div class="form">
-                  <div>
-                    <q-input v-model="selectedBook.id" label="ID" disable borderless  class="InP"/>
+                  <div style="width: 270px;">
                     <q-input v-model="selectedBook.name" label="Nome" required borderless  class="InP"/>
                     <q-input v-model="selectedBook.author" label="Autor" required borderless  class="InP"/>
+                    <q-input v-model="selectedBook.totalQuantity" label="Estoque" type="number" min="1" required borderless  class="InP"/>
                   </div>
 
                   <div>
-                    <q-input v-model="selectedBook.totalQuantity" label="Estoque" type="number" min="1" required borderless  class="InP"/>
                     <q-input v-model="selectedBook.launchDate" label="Data de Lançamento" type="date" required borderless class="InP"/>
                     <q-select
                     v-model="selectedBook.publisherId"
@@ -140,10 +139,11 @@
             </q-card-section>
           </q-card>
         </q-dialog>
-        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
-          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
-          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
-         </q-card-section>
+        <q-card-section  class="PaginacaoContainer q-px-md q-py-sm"
+        style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage" aria-label="Página anterior"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage" aria-label="Próxima página"></q-btn>
+        </q-card-section>
       </q-page>
 
     </q-page-container>
@@ -554,7 +554,6 @@ export default {
 
 .JmodalBook .ModalCard {
   background-color: white;
-  min-width: 50%;
   border: 2px solid black;
   border-radius: 20px;
 }
@@ -579,8 +578,8 @@ export default {
   background-color: white;
   border: solid 2px rgba(0, 0, 0, 0.550);
   padding-left: 10px;
-  width: 250px;
-  height: 55px;
+  width: 230px;
+  height: 50px;
 }
 
 .JmodalBook .InputView {

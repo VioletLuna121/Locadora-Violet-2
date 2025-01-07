@@ -31,9 +31,7 @@
         bordered
         >
           <q-list>
-            <router-link to="/DashBoard" class="LogoImg">
-              <img :src="logo" class="Blogo" />
-            </router-link>
+            <img :src="logo" class="Blogo LogoImg" />
             <router-link
               v-for="link in linksList"
               :key="link.title"
@@ -51,7 +49,7 @@
 
             </q-item>
           </router-link>
-          <q-item-section style="color: #333333; display: flex; justify-content: center; align-items: center; margin-top: 60%;">
+          <q-item-section style="color: #333333; display: flex; justify-content: center; align-items: center; margin-top: 50%;">
             <router-link to="/" style="">
               <q-btn flat icon="logout" size="25px" @click="logout" aria-label="Sair" style="color: #333333;"></q-btn>
             </router-link>
@@ -88,6 +86,11 @@ defineOptions({
 })
 
 const linksList = [
+{
+    title: 'Dashboard',
+    icon: 'dashboard',
+    name: '/Dashboard',
+  },
   {
     title: 'Cadastro de Usuário',
     icon: 'person',
@@ -153,21 +156,41 @@ const isDashboardPage = computed(() => route.path === '/DashBoard')
 
   }
 
-  .LinksList{
-    text-decoration: none;
-    color: rgba(0, 0, 0, 0.829);
-    text-indent: 20px;
+  .LinksList {
+  position: relative;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.829);
+  text-indent: 20px;
+  display: block;
+  overflow: hidden; 
+  transition: all 0.4s;
+}
 
-  }
+.LinksList.router-link-active {
+  background-color: #b3eef1;
+  color: rgba(0, 0, 0, 0.829);
+  font-weight: bold;
+
+}
+
+
+.LinksList:hover {
+  background-color: #b3eef1;
+  color: rgba(0, 0, 0, 0.829);
+
+
+
+}
 
   .dashboard-title {
-    font-size: 22px; /* Aumenta o tamanho da fonte */
+    font-size: 22px;
     font-weight: 400;
     border-left: 2px solid black;
     padding-left: 10px !important;
     margin-left: 5px;
-    width: auto; /* Permitir que a largura seja ajustada automaticamente */
+    width: auto;
   }
+
 
 
 </style>

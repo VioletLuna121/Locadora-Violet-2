@@ -36,7 +36,7 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form>
                 <q-select
                 v-model="newUser.renterId"
@@ -69,7 +69,6 @@
           </q-card>
         </q-dialog>
 
-          <!-- Modal para Confirmar Exclusão -->
         <q-dialog v-model="AbrirDevolucaoModal" class="DeleteModal JmodalRent Sombra" persistent>
           <q-card class="DeleteModalCard Sombra">
             <q-card-section class="q-pa-md q-pt-none q-pb-none padding_zero">
@@ -79,7 +78,7 @@
             </q-card-section>
 
             <q-card-section class="padding_zero">
-              <p class="textDelete">Você deseja registrar a devolução do livro: ?</p>
+              <p class="textDelete">Você deseja registrar a devolução do livro ?</p>
             </q-card-section>
 
             <q-card-section class=" q-gutter-sm q-pt-none CardButtonDelete">
@@ -90,9 +89,10 @@
             </q-card-section>
           </q-card>
         </q-dialog>
-        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
-          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
-          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
+        <q-card-section  class="PaginacaoContainer q-px-md q-py-sm"
+        style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage" aria-label="Página anterior"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage" aria-label="Próxima página"></q-btn>
         </q-card-section>
       </q-page>
     </q-page-container>
@@ -431,6 +431,7 @@ export default {
 }
 
 .JmodalRent .InP {
+  height: 50px;
   margin-right: 25px;
   margin-left: 25px;
   margin-top: 20px;

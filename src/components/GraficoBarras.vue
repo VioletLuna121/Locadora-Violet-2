@@ -30,7 +30,7 @@ export default defineComponent({
         datasets: [
           {
             label: "Status dos Aluguéis",
-            backgroundColor: ["#4caf50", "#ff9800", "#2196f3", "#f44336"],
+            backgroundColor: ["#b3eef1", "#ffb394", "#bcc7d9", "#deb7d5"],
             data: [0, 0, 0, 0], // Inicializa os dados com valores 0
           },
         ],

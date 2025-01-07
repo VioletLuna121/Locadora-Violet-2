@@ -3,7 +3,7 @@
     <q-page-container>
       <q-page>
         <div class="MiniModais">
-          <!-- Retângulo de Atrasados -->
+
           <q-card class="box">
               <div class="content">
                 <div>
@@ -11,12 +11,16 @@
                   <div class="textBox">Atrasados</div>
                 </div>
                 <div class="icon">
-                  <q-icon name="warning" size="44px" style="color: #b3eef1;"></q-icon> <!-- Ícone de Atrasados -->
+                  <q-icon name="warning" size="44px" style="color: #b3eef1;"></q-icon>
                 </div>
               </div>
+              <q-tooltip
+              class="TextoFlut"
+              anchor="top middle"
+              :offset="[0, 5]">Devoluções de livros em atraso</q-tooltip>
           </q-card>
 
-            <!-- Retângulo de ALugados -->
+
           <q-card class="box">
             <div class="content">
               <div>
@@ -24,13 +28,17 @@
                 <div class="textBox">Alugados</div>
               </div>
               <div class="icon">
-                <q-icon name="book" size="44px" style="color: #b3eef1;"></q-icon> <!-- Ícone de Empréstimos -->
+                <q-icon name="book" size="44px" style="color: #b3eef1;"></q-icon>
               </div>
 
             </div>
+            <q-tooltip
+              class="TextoFlut"
+              anchor="top middle"
+              :offset="[0, 5]">Quantidade de alugueis já feitos</q-tooltip>
           </q-card>
 
-              <!-- Ícone de Devolvidos -->
+
             <q-card class="box">
             <div class="content">
               <div>
@@ -38,13 +46,16 @@
                 <div class="textBox">Devolvidos</div>
               </div>
               <div class="icon">
-                <q-icon name="beenhere" size="44px" style="color: #b3eef1;"></q-icon>  <!-- Ícone de Devolvidos -->
+                <q-icon name="beenhere" size="44px" style="color: #b3eef1;"></q-icon>
               </div>
 
             </div>
+            <q-tooltip
+              class="TextoFlut"
+              anchor="top middle"
+              :offset="[0, 5]">Quantidade de livros devolvidos</q-tooltip>
           </q-card>
 
-                <!-- Retângulo de Estoque -->
                 <q-card class="box">
             <div class="content">
               <div>
@@ -56,6 +67,10 @@
               </div>
 
             </div>
+            <q-tooltip
+              class="TextoFlut"
+              anchor="top middle"
+              :offset="[0, 5]">Quantidade de livros cadastrados</q-tooltip>
           </q-card>
         </div>
 
@@ -64,6 +79,12 @@
           <TabelaGeral :rows="tableDataBest" :columns="tableColumnsBest" :rows-per-page="5" class="TGeral2"/>
           <GraficoBarras class="Grafico"/>
         </div>
+
+        <q-card-section  class="PaginacaoContainer q-px-md q-py-sm"
+        style="display: flex; justify-content: left ; gap: 10px; flex-wrap: wrap; margin-left: 120px;">
+          <q-btn flat icon="arrow_left" class="PaginacaoDashboard icon-larger" @click="backPage" aria-label="Página anterior"></q-btn>
+          <q-btn flat icon="arrow_right"  class="PaginacaoDashboard icon-larger" @click="nextPage" aria-label="Próxima página"></q-btn>
+        </q-card-section>
 
       </q-page>
     </q-page-container>
@@ -162,11 +183,13 @@ export default {
       BuscarLivros();
     });
 
+    const currentPage = ref(0);
+
     const tableUserRenters = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await api.get(`/rent/renters`, {
-          params: { size: 1000, sort: 'id', direction: 'ASC', },
+          params: { size: 5,page:currentPage.value, sort: 'id', direction: 'ASC', },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -238,6 +261,18 @@ export default {
       BestBooks();
     });
 
+    const nextPage = () => {
+      currentPage.value++;
+      tableUserRenters();
+    };
+
+    const backPage = () => {
+      if (currentPage.value > 0) {
+        currentPage.value--;
+        tableUserRenters();
+      }
+    };
+
 
 
     return{
@@ -249,7 +284,9 @@ export default {
       Atrasados,
       Devolvidos,
       Alugados,
-      Livros
+      Livros,
+      nextPage,
+      backPage,
     }
 
   }
@@ -315,17 +352,17 @@ export default {
 }
 
 .Conteudo .TGeral{
-  height: 390px;
+  height: 370px;
   width: 30%;
   margin-left: 20px;
-  margin-top: 20px;
+  margin-top: 30px;
   overflow-x: hidden;
 }
 
 .Conteudo .TGeral2{
-  height: 390px;
+  height: 370px;
   width: 22%;
-  margin-top: 20px;
+  margin-top: 30px;
   margin-right: 20px;
   overflow-x: hidden;
 }
@@ -342,5 +379,25 @@ export default {
   font-weight: bold;
 }
 
+.PaginacaoDashboard{
+  color: #333333;
+  border: solid 1px rgba(0, 0, 0, 0.795);
+  height: 30px;
+  width: 40px;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.479);
+
+}
+
+.icon-larger .q-icon {
+  font-size: 40px; /* Ajuste o tamanho do ícone */
+  display: flex;
+  position: relative;
+  bottom: 7px;
+}
+
+.TextoFlut{
+  margin-left: 40px !important;
+  font-size: 12px;
+}
 
 </style>

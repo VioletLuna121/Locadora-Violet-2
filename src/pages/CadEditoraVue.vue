@@ -18,7 +18,7 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form>
                 <q-input v-model="newUser.name" label="Editora" required borderless  class="InP"/>
                 <q-input v-model="newUser.email" label="Email" type="email" required borderless  class="InP"/>
@@ -61,8 +61,7 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
-              <q-input v-model="selectedPublisher.id" label="Editora" disable borderless  class="InP"/>
+            <q-card-section style="padding-top: 5px;">
               <q-input v-model="selectedPublisher.name" label="Editora" required borderless  class="InP"/>
               <q-input v-model="selectedPublisher.email" label="Email" type="email" required borderless  class="InP"/>
               <q-input v-model="selectedPublisher.telephone" label="Telefone" type="tel" required borderless  class="InP"/>
@@ -94,9 +93,10 @@
             </q-card-section>
           </q-card>
         </q-dialog>
-        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
-          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
-          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
+        <q-card-section  class="PaginacaoContainer q-px-md q-py-sm"
+        style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; ">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage" aria-label="Página anterior"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage" aria-label="Próxima página"></q-btn>
         </q-card-section>
       </q-page>
     </q-page-container>
@@ -363,7 +363,7 @@ export default {
         } catch (error) {
         // Exibir mensagem de erro
         const errorMessage =
-          error.response?.data?.message || 'Erro ao deletar Editora.';
+          error.response?.data?.message || 'Erro ao deletar Editora, esta Editora deve estar vinculada a algum livro.';
         Notify.create({
           type: 'negative',
           message: `${errorMessage}`,
@@ -462,7 +462,7 @@ export default {
 
 .JmodalPublisher .ModalCard {
   background-color: white;
-  width: 420px;
+  width:  350px;
   border: 2px solid  rgba(0, 0, 0, 0.699);
   border-radius: 20px;
 }
@@ -472,6 +472,7 @@ export default {
 }
 
 .JmodalPublisher .InP {
+  height: 50px;
   margin-right: 25px;
   margin-left: 25px;
   margin-top: 20px;
@@ -487,14 +488,14 @@ export default {
 }
 
 .JmodalPublisher .CadastroButtom {
-  margin-left: 130px;
+  margin-left: 100px;
   margin-top: 25px;
   margin-bottom: 10px;
   background-color: #82e2e9;
 }
 
 .JmodalPublisher .EditarButtom{
-  margin-left: 150px;
+  margin-left: 120px;
   margin-top: 20px;
   margin-bottom: 10px;
   background-color: #82e2e9;
@@ -558,7 +559,7 @@ export default {
 }
 
 .marginBottom{
-  margin-bottom: 20px;
+  padding-top: 5px;
 
 }
 

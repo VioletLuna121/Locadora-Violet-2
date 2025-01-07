@@ -18,13 +18,12 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 5px;">
               <q-form @submit.prevent="CadNovoUser">
                 <q-input v-model="newUser.username" label="Nome" required borderless  class="InP"/>
                 <q-input v-model="newUser.email" label="Email" type="email" required borderless  class="InP"/>
                 <PasswordInput label="Senha" class="InP" v-model="newUser.password" borderless required/>
 
-                <!-- Checkboxes de Permissão -->
                 <div class="q-gutter-md permission">
                   <q-radio v-model="newUser.role" val="VISITOR" label="VISITOR" color="$primary"/>
                   <q-radio v-model="newUser.role" val="ADMIN" label="ADMIN" color="$primary"/>
@@ -46,7 +45,7 @@
 
             <q-separator style="height: 2px; background-color: rgba(0, 0, 0, 0.400);"/>
 
-            <q-card-section>
+            <q-card-section style="padding-top: 10px;">
               <q-input v-model="DadosUser.id" label="ID" borderless class="InP" disable />
               <q-input v-model="DadosUser.name" label="Nome" borderless class="InP" disable />
               <q-input v-model="DadosUser.email" label="Email" type="email" borderless class="InP" disable />
@@ -67,7 +66,6 @@
 
             <q-card-section>
 
-              <q-input v-model="selectedUser.id" label="ID" borderless disable class="InP"/>
               <q-input v-model="selectedUser.name" label="Nome" borderless class="InP"/>
               <q-input v-model="selectedUser.email" label="Email" type="email" borderless class="InP"/>
 
@@ -102,9 +100,10 @@
             </q-card-section>
           </q-card>
         </q-dialog>
-        <q-card-section style="padding: 0px !important; display: flex; justify-content: center; gap: 15px; position: fixed; left: 770px; bottom: 15px; ">
-          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage"></q-btn>
-          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage"></q-btn>
+        <q-card-section  class="PaginacaoContainer q-px-md q-py-sm"
+        style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+          <q-btn flat icon="arrow_left" class="Paginacao icon-larger" @click="backPage" aria-label="Página anterior"></q-btn>
+          <q-btn flat icon="arrow_right"  class="Paginacao icon-larger" @click="nextPage" aria-label="Próxima página"></q-btn>
         </q-card-section>
       </q-page>
     </q-page-container>
@@ -296,11 +295,10 @@ export default {
           }
         );
 
-          // Verifica se a atualização foi bem-sucedida
           if (response.status === 204) {
             console.log('Usuário atualizado com sucesso.');
-            AbrirModalEdit.value = false; // Fecha o modal de edição
-            await PageUser(); // Atualiza a lista de usuários
+            AbrirModalEdit.value = false;
+            await PageUser();
           } else {
             console.warn('A API retornou um status inesperado:', response.status);
           }
@@ -467,7 +465,7 @@ export default {
 
 .JmodalUser .ModalCard {
   background-color: #ffffff;
-  width: 420px;
+  width: 350px;
   border: 2px solid  rgba(0, 0, 0, 0.699);
   border-radius: 20px;
 }
@@ -477,6 +475,8 @@ export default {
 }
 
 .JmodalUser .InP {
+
+  height: 50px;
   margin-right: 25px;
   margin-left: 25px;
   margin-top: 20px;
@@ -495,7 +495,7 @@ export default {
   display:flex ;
   justify-content: center;
   margin-left: 10px;
-  margin-top: 5px;
+  margin-top: -5px;
   padding-right: 30px;
   display: flex;
   gap: 25%;
@@ -503,7 +503,7 @@ export default {
 }
 
 .JmodalUser .CadastroButtom {
-  margin-left: 130px;
+  margin-left: 100px;
   margin-top: 15px;
   margin-bottom: 10px;
   background-color: #82e2e9;
@@ -511,7 +511,7 @@ export default {
 }
 
 .JmodalUser .EditarButtom{
-  margin-left: 150px;
+  margin-left: 120px;
   margin-top: 15px;
   margin-bottom: 10px;
   background-color: #82e2e9;
